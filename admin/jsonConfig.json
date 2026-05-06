@@ -1,0 +1,163 @@
+{
+  "type": "panel",
+  "label": "NexoWatt EEBUS",
+  "items": {
+    "generalHeader": {
+      "type": "header",
+      "text": "General"
+    },
+    "discoveryEnabled": {
+      "type": "checkbox",
+      "label": "Enable EEBUS mDNS discovery",
+      "default": true,
+      "help": "Browses local _ship._tcp and _shippairing._tcp services."
+    },
+    "measurementIntervalSec": {
+      "type": "number",
+      "label": "Measurement polling interval",
+      "min": 5,
+      "max": 3600,
+      "sm": 6,
+      "default": 10,
+      "unit": "s"
+    },
+    "metadataIntervalSec": {
+      "type": "number",
+      "label": "Metadata polling interval",
+      "min": 30,
+      "max": 86400,
+      "sm": 6,
+      "default": 60,
+      "unit": "s"
+    },
+    "shipHeader": {
+      "type": "header",
+      "text": "Local SHIP endpoint"
+    },
+    "shipServerEnabled": {
+      "type": "checkbox",
+      "label": "Enable local TLS/WebSocket SHIP endpoint",
+      "default": true,
+      "help": "Starts a local /ship/ endpoint. Full SHIP/SPINE certification still requires device tests."
+    },
+    "announceShipService": {
+      "type": "checkbox",
+      "label": "Announce local SHIP service via mDNS",
+      "default": false,
+      "help": "Experimental. Enable only during pairing/testing after verifying the local endpoint."
+    },
+    "shipPort": {
+      "type": "number",
+      "label": "Local SHIP port",
+      "min": 1024,
+      "max": 65535,
+      "default": 4712,
+      "sm": 6
+    },
+    "shipPath": {
+      "type": "text",
+      "label": "SHIP WebSocket path",
+      "default": "/ship/",
+      "sm": 6
+    },
+    "identityHeader": {
+      "type": "header",
+      "text": "EEBUS identity"
+    },
+    "brand": {
+      "type": "text",
+      "label": "Brand",
+      "default": "NexoWatt",
+      "sm": 6
+    },
+    "model": {
+      "type": "text",
+      "label": "Model",
+      "default": "ioBroker EEBUS Adapter",
+      "sm": 6
+    },
+    "deviceType": {
+      "type": "text",
+      "label": "Device type",
+      "default": "EnergyManagementSystem",
+      "sm": 6
+    },
+    "deviceCategories": {
+      "type": "text",
+      "label": "SHIP device categories",
+      "default": "2",
+      "sm": 6,
+      "help": "Comma-separated EEBUS category numbers. 2 = Energy Management System."
+    },
+    "ianaPen": {
+      "type": "text",
+      "label": "IANA PEN",
+      "default": "999999",
+      "sm": 6,
+      "help": "Used for generated SHIP IDs. Replace the placeholder with the real NexoWatt PEN when available."
+    },
+    "shipId": {
+      "type": "text",
+      "label": "Generated SHIP ID",
+      "readOnly": true,
+      "sm": 12
+    },
+    "localSki": {
+      "type": "text",
+      "label": "Generated local SKI",
+      "readOnly": true,
+      "sm": 12
+    },
+    "certificateFingerprint": {
+      "type": "text",
+      "label": "Certificate fingerprint SHA-256",
+      "readOnly": true,
+      "sm": 12
+    },
+    "secretsHeader": {
+      "type": "header",
+      "text": "Secrets / advanced identity"
+    },
+    "pairingPin": {
+      "type": "password",
+      "label": "Optional pairing PIN",
+      "sm": 6
+    },
+    "certificate": {
+      "type": "textarea",
+      "label": "Certificate PEM",
+      "rows": 6,
+      "sm": 12,
+      "help": "Leave empty to generate a local certificate on first start."
+    },
+    "privateKey": {
+      "type": "textarea",
+      "label": "Private key PEM",
+      "rows": 6,
+      "sm": 12,
+      "help": "Protected/encrypted. Leave empty to generate a local private key on first start."
+    },
+    "commandsHeader": {
+      "type": "header",
+      "text": "Commands"
+    },
+    "allowCommandsToUntrustedDevices": {
+      "type": "checkbox",
+      "label": "Allow commands to untrusted devices",
+      "default": false,
+      "help": "Default is off. Commands to untrusted or unknown devices are recorded but not sent."
+    },
+    "commandDryRun": {
+      "type": "checkbox",
+      "label": "Command dry run",
+      "default": true,
+      "help": "Records draft SPINE command payloads without sending them. Disable only after field validation."
+    },
+    "debugRawMessages": {
+      "type": "checkbox",
+      "label": "Store raw diagnostic messages",
+      "default": false,
+      "help": "May create large states. Enable only for troubleshooting."
+    }
+  }
+}

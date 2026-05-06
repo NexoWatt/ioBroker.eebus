@@ -1,60 +1,127 @@
 {
+  "$schema": "https://raw.githubusercontent.com/ioBroker/ioBroker.js-controller/master/schemas/io-package.json",
   "common": {
     "name": "eebus",
-    "version": "0.0.1",
-    "title": "NexoWatt EEBus / Imsys",
+    "version": "0.1.0",
     "titleLang": {
-      "en": "NexoWatt EEBus / Imsys",
-      "de": "NexoWatt EEBus / Imsys"
+      "en": "NexoWatt EEBUS Adapter",
+      "de": "NexoWatt EEBUS Adapter",
+      "ru": "NexoWatt EEBUS Adapter",
+      "pt": "Adaptador EEBUS NexoWatt",
+      "nl": "NexoWatt EEBUS Adapter",
+      "fr": "Adaptateur EEBUS NexoWatt",
+      "it": "Adattatore EEBUS NexoWatt",
+      "es": "Adaptador EEBUS NexoWatt",
+      "pl": "Adapter EEBUS NexoWatt",
+      "uk": "Адаптер NexoWatt EEBUS",
+      "zh-cn": "NexoWatt EEBUS 适配器"
     },
     "desc": {
-      "en": "Provides datapoints for EEBus / Imsys integration and utility control for NexoWatt EMS.",
-      "de": "Stellt Datenpunkte für EEBus-/Imsys-Integration und Steuerung durch den Energieversorger für NexoWatt EMS bereit."
+      "en": "Connect local EEBUS SHIP/SPINE energy devices such as wallboxes, inverters, smart meters and CLS boxes.",
+      "de": "Verbindet lokale EEBUS SHIP/SPINE-Energiegeräte wie Wallboxen, Wechselrichter, Smart Meter und CLS-Boxen.",
+      "ru": "Подключает локальные энергетические устройства EEBUS SHIP/SPINE, такие как зарядные станции, инверторы, интеллектуальные счетчики и CLS-боксы.",
+      "pt": "Liga dispositivos de energia EEBUS SHIP/SPINE locais, como wallboxes, inversores, contadores inteligentes e caixas CLS.",
+      "nl": "Verbindt lokale EEBUS SHIP/SPINE-energieapparaten zoals wallboxen, omvormers, slimme meters en CLS-boxen.",
+      "fr": "Connecte des appareils énergétiques locaux EEBUS SHIP/SPINE comme les bornes de recharge, onduleurs, compteurs intelligents et boîtiers CLS.",
+      "it": "Collega dispositivi energetici locali EEBUS SHIP/SPINE come wallbox, inverter, smart meter e box CLS.",
+      "es": "Conecta dispositivos energéticos locales EEBUS SHIP/SPINE como cargadores, inversores, contadores inteligentes y cajas CLS.",
+      "pl": "Łączy lokalne urządzenia energetyczne EEBUS SHIP/SPINE, takie jak wallboxy, falowniki, inteligentne liczniki i skrzynki CLS.",
+      "uk": "Підключає локальні енергетичні пристрої EEBUS SHIP/SPINE, такі як зарядні станції, інвертори, розумні лічильники та CLS-бокси.",
+      "zh-cn": "连接本地 EEBUS SHIP/SPINE 能源设备，例如壁挂式充电桩、逆变器、智能电表和 CLS 盒。"
+    },
+    "authors": [
+      "NexoWatt <info@nexowatt.de>"
+    ],
+    "keywords": [
+      "eebus",
+      "ship",
+      "spine",
+      "energy",
+      "wallbox",
+      "inverter",
+      "smart-meter",
+      "cls-box",
+      "nexowatt"
+    ],
+    "licenseInformation": {
+      "type": "limited",
+      "license": "UNLICENSED",
+      "link": "https://raw.githubusercontent.com/NexoWatt/ioBroker.eebus/main/LICENSE"
     },
     "platform": "Javascript/Node.js",
-    "license": "MIT",
+    "icon": "eebus.svg",
+    "enabled": false,
+    "extIcon": "https://raw.githubusercontent.com/NexoWatt/ioBroker.eebus/main/admin/eebus.svg",
+    "readme": "https://github.com/NexoWatt/ioBroker.eebus/blob/main/README.md",
+    "loglevel": "info",
     "mode": "daemon",
     "type": "energy",
-    "icon": "nexowatt.png",
-    "enabled": true,
-    "extIcon": "https://raw.githubusercontent.com/NexoWatt/ioBroker-EEBus/master/admin/nexowatt.png",
-    "readme": "https://github.com/NexoWatt/ioBroker-EEBus/blob/master/README.md",
-    "loglevel": "info",
+    "tier": 2,
     "compact": true,
     "connectionType": "local",
     "dataSource": "push",
-    "materialize": true,
-    "messagebox": false
+    "adminUI": {
+      "config": "json"
+    },
+    "dataFolder": "eebus.%INSTANCE%",
+    "dependencies": [
+      {
+        "js-controller": ">=6.0.11"
+      }
+    ],
+    "globalDependencies": [
+      {
+        "admin": ">=7.7.22"
+      }
+    ],
+    "protectedNative": [
+      "certificate",
+      "privateKey",
+      "pairingPin"
+    ],
+    "encryptedNative": [
+      "privateKey",
+      "pairingPin"
+    ]
   },
   "native": {
-    "host": "",
-    "port": 4711,
-    "useTLS": true,
-    "allowUtilityControl": true
+    "discoveryEnabled": true,
+    "measurementIntervalSec": 10,
+    "metadataIntervalSec": 60,
+    "shipServerEnabled": true,
+    "announceShipService": false,
+    "shipPort": 4712,
+    "shipPath": "/ship/",
+    "brand": "NexoWatt",
+    "model": "ioBroker EEBUS Adapter",
+    "deviceType": "EnergyManagementSystem",
+    "deviceCategories": "2",
+    "ianaPen": "999999",
+    "pairingPin": "",
+    "certificate": "",
+    "privateKey": "",
+    "shipId": "",
+    "localSki": "",
+    "certificateFingerprint": "",
+    "allowCommandsToUntrustedDevices": false,
+    "commandDryRun": true,
+    "debugRawMessages": false
   },
   "objects": [],
   "instanceObjects": [
     {
-      "_id": "info",
-      "type": "channel",
+      "_id": "info.connection",
+      "type": "state",
       "common": {
-        "name": "Information"
-      },
-      "native": {}
-    },
-    {
-      "_id": "imsys",
-      "type": "channel",
-      "common": {
-        "name": "Imsys meter"
-      },
-      "native": {}
-    },
-    {
-      "_id": "utility",
-      "type": "channel",
-      "common": {
-        "name": "Utility control"
+        "role": "indicator.connected",
+        "name": {
+          "en": "Connection",
+          "de": "Verbindung"
+        },
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
       },
       "native": {}
     }
