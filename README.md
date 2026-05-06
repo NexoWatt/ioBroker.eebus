@@ -2,7 +2,7 @@
 
 NexoWatt EEBUS Adapter for ioBroker.
 
-This adapter is an internal NexoWatt adapter prototype for local EEBUS SHIP/SPINE communication with energy devices such as wallboxes, inverters, smart meters, CLS boxes, batteries and grid connection points.
+This adapter is a NexoWatt EEBUS adapter prototype for local EEBUS SHIP/SPINE communication with energy devices such as wallboxes, inverters, smart meters, CLS boxes, batteries and grid connection points. It is prepared for publication as the npm package `iobroker.eebus` and for HTTPS-based installation from the GitHub repository.
 
 > Status: initial implementation scaffold. It is designed to be field-tested with real devices before production use.
 
@@ -112,6 +112,22 @@ setpointPower
 pairing.trusted
 ```
 
+## Installation
+
+After publication to the npm registry:
+
+```bash
+npm install iobroker.eebus
+```
+
+For ioBroker systems, install the adapter through the ioBroker admin interface or CLI once the package is available. During development or controlled rollout, the repository can also be installed via HTTPS:
+
+```bash
+npm install git+https://github.com/NexoWatt/ioBroker.eebus.git
+```
+
+The package is published under a proprietary NexoWatt license. Public availability of the package does not grant third-party usage, copying, modification, redistribution or sublicensing rights.
+
 ## Configuration
 
 Default configuration:
@@ -177,8 +193,8 @@ The adapter requires Node.js 20 or newer.
 
 ## License
 
-UNLICENSED / proprietary.
+NexoWatt Proprietary License.
 
 Copyright © 2026 NexoWatt. All rights reserved.
 
-This software may only be used by NexoWatt. See [LICENSE](LICENSE).
+This software may only be used by NexoWatt or by parties explicitly authorized in writing by NexoWatt. Public npm/GitHub availability does not make this adapter open source. See [LICENSE](LICENSE).

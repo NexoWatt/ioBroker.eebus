@@ -45,7 +45,7 @@
     ],
     "licenseInformation": {
       "type": "limited",
-      "license": "UNLICENSED",
+      "license": "NexoWatt Proprietary License",
       "link": "https://raw.githubusercontent.com/NexoWatt/ioBroker.eebus/main/LICENSE"
     },
     "platform": "Javascript/Node.js",

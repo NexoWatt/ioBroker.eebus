@@ -6,13 +6,12 @@
   "homepage": "https://github.com/NexoWatt/ioBroker.eebus#readme",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/NexoWatt/ioBroker.eebus.git"
+    "url": "git+https://github.com/NexoWatt/ioBroker.eebus.git"
   },
   "bugs": {
     "url": "https://github.com/NexoWatt/ioBroker.eebus/issues"
   },
-  "license": "UNLICENSED",
-  "private": true,
+  "license": "SEE LICENSE IN LICENSE",
   "main": "build/main.js",
   "types": "build/main.d.ts",
   "keywords": [
@@ -38,6 +37,9 @@
     "README.md",
     "CHANGELOG.md"
   ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "watch": "tsc -p tsconfig.json --watch",
