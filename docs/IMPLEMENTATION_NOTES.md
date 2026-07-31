@@ -18,6 +18,8 @@ The private key and pairing PIN are listed in `encryptedNative`. The certificate
 
 ## SHIP TXT data
 
+`announceShipService` is enabled by default because external devices such as wallboxes need the EOS HEMS endpoint to be visible via `_ship._tcp` mDNS discovery.
+
 When `announceShipService` is enabled, the local mDNS TXT record contains:
 
 ```text
@@ -50,3 +52,17 @@ Not yet complete:
 - complete SPINE feature/entity addressing
 - final device-specific command payloads
 - tested CLS/grid operator workflow
+
+## 0.1.2 HEMS visibility fix
+
+NexoWatt EOS is the local Energy Management System. Therefore the adapter now announces the local SHIP service as a user-visible HEMS endpoint:
+
+```text
+NexoWatt EOS._ship._tcp.local
+TXT type=EnergyManagementSystem
+TXT brand=NexoWatt
+TXT model=EOS
+TXT register=true
+```
+
+The announcement is enforced while `deviceType` is `EnergyManagementSystem`, because older ioBroker native configurations can keep a stored `announceShipService=false` value after an update. Without the local `_ship._tcp` announcement, a wallbox can run its EEBUS/HEMS search but will not display NexoWatt EOS in the pairing list.

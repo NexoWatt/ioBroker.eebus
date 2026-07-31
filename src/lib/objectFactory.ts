@@ -1,3 +1,4 @@
+import { EebusConfig } from './config';
 import { DiscoveredShipNode, EebusIdentity } from './eebusTypes';
 import { channelNames, deviceStates, discoveryStates, identityStates, StateDefinition } from './stateDefinitions';
 
@@ -16,7 +17,10 @@ export class ObjectFactory {
         }
     }
 
-    public async publishIdentity(identity: EebusIdentity): Promise<void> {
+    public async publishIdentity(identity: EebusIdentity, config: EebusConfig): Promise<void> {
+        await this.adapter.setStateAsync('identity.serviceName', { val: config.serviceName, ack: true });
+        await this.adapter.setStateAsync('identity.deviceType', { val: config.deviceType, ack: true });
+        await this.adapter.setStateAsync('identity.announcementActive', { val: config.shipServerEnabled && config.announceShipService, ack: true });
         await this.adapter.setStateAsync('identity.localSki', { val: identity.localSki, ack: true });
         await this.adapter.setStateAsync('identity.shipId', { val: identity.shipId, ack: true });
         await this.adapter.setStateAsync('identity.certificateFingerprint', {

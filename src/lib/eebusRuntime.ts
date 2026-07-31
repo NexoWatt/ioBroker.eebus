@@ -36,6 +36,10 @@ export class EebusRuntime {
         this.metadataInterval = this.adapter.setInterval(() => void this.refreshMetadata(), this.config.metadataIntervalSec * 1000);
 
         await this.adapter.setStateAsync('info.connection', { val: endpointStarted || this.config.discoveryEnabled, ack: true });
+        await this.adapter.setStateAsync('identity.announcementActive', {
+            val: endpointStarted && this.config.announceShipService,
+            ack: true,
+        });
         await this.adapter.setStateAsync('discovery.enabled', { val: this.config.discoveryEnabled, ack: true });
     }
 
@@ -56,6 +60,7 @@ export class EebusRuntime {
         await this.endpoint?.stop();
         this.endpoint = undefined;
 
+        await this.adapter.setStateAsync('identity.announcementActive', { val: false, ack: true });
         await this.adapter.setStateAsync('info.connection', { val: false, ack: true });
     }
 

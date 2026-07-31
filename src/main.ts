@@ -27,7 +27,7 @@ class EebusAdapter extends utils.Adapter {
 
         try {
             const identity = await new IdentityManager(this, config).ensureIdentity();
-            await objectFactory.publishIdentity(identity);
+            await objectFactory.publishIdentity(identity, config);
 
             this.runtime = new EebusRuntime(this, config, identity, objectFactory);
             await this.runtime.start();

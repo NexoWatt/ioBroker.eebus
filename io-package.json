@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/ioBroker/ioBroker.js-controller/master/schemas/io-package.json",
   "common": {
     "name": "eebus",
-    "version": "0.1.0",
+    "version": "0.1.2",
     "titleLang": {
       "en": "NexoWatt EEBUS Adapter",
       "de": "NexoWatt EEBUS Adapter",
@@ -89,7 +89,7 @@
     "measurementIntervalSec": 10,
     "metadataIntervalSec": 60,
     "shipServerEnabled": true,
-    "announceShipService": false,
+    "announceShipService": true,
     "shipPort": 4712,
     "shipPath": "/ship/",
     "brand": "NexoWatt",

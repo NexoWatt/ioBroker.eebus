@@ -12,6 +12,9 @@ export interface StateDefinition {
 }
 
 export const identityStates: StateDefinition[] = [
+    { id: 'serviceName', name: 'Local SHIP service name', channel: 'info', type: 'string', role: 'info.name', read: true, write: false },
+    { id: 'deviceType', name: 'Local EEBUS device type', channel: 'info', type: 'string', role: 'info', read: true, write: false },
+    { id: 'announcementActive', name: 'Local HEMS announcement active', channel: 'info', type: 'boolean', role: 'indicator', read: true, write: false, def: false },
     { id: 'localSki', name: 'Local SKI', channel: 'info', type: 'string', role: 'info', read: true, write: false },
     { id: 'shipId', name: 'Local SHIP ID', channel: 'info', type: 'string', role: 'info', read: true, write: false },
     {

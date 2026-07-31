@@ -1,19 +1,21 @@
 # Changelog
 
-## 0.1.0 (2026-05-06)
+## 0.1.2
 
-- Initial NexoWatt EEBUS adapter skeleton prepared for npm/HTTPS distribution.
-- Added local SHIP identity generation with persistent SHIP ID, certificate, private key and SKI.
-- Added JSONConfig admin UI.
-- Added EEBUS mDNS discovery skeleton for `_ship._tcp` and `_shippairing._tcp` services.
-- Added optional local TLS/WebSocket SHIP endpoint skeleton.
-- Added ioBroker object model for devices, measurements, controls, limits, pairing and raw diagnostics.
-- Added command routing scaffold for charging enablement, charging limits, active power limits and setpoints.
-- Added GitHub Actions, Dependabot and proprietary NexoWatt license.
-- Prepared npm publication metadata and HTTPS GitHub repository references.
+- Announce the local SHIP service with the visible service instance name `NexoWatt EOS`.
+- Set the default EEBUS model to `EOS` and keep the default device type as `EnergyManagementSystem`.
+- Enforce SHIP mDNS announcement while running in `EnergyManagementSystem` mode so old instances with `announceShipService=false` still become visible for wallbox pairing.
+- Add identity states for `serviceName`, `deviceType` and `announcementActive`.
+- Use the SHIP WebSocket subprotocol `ship` and disable WebSocket compression for the local endpoint scaffold.
+- Preserve spaces in SHIP TXT values while respecting the SHIP TXT size limits.
 
-### Known limitations
+## 0.1.1
 
-- Real device communication has not been validated with physical wallboxes, inverters, smart meters or CLS boxes.
-- SPINE payloads are implemented as draft command envelopes and must be verified against real device traces.
-- Pairing/trust workflow is intentionally conservative and still requires field testing.
+- Enable local SHIP mDNS announcement by default so EEBUS wallboxes can discover EOS as HEMS.
+- Add warning log when mDNS announcement is disabled.
+- Correct SHIP TXT `ecc` value to `false` because the current identity generation only uses secp256r1.
+
+## 0.1.0
+
+- Initial NexoWatt EEBUS adapter scaffold.
+- Added local SHIP identity generation, mDNS discovery, SHIP endpoint scaffold and ioBroker object model.

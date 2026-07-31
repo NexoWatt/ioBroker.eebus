@@ -43,8 +43,8 @@
     "announceShipService": {
       "type": "checkbox",
       "label": "Announce local SHIP service via mDNS",
-      "default": false,
-      "help": "Experimental. Enable only during pairing/testing after verifying the local endpoint."
+      "default": true,
+      "help": "Required when wallboxes or other EEBUS devices should discover EOS as local HEMS automatically via _ship._tcp. In EnergyManagementSystem mode this is enforced by the adapter."
     },
     "shipPort": {
       "type": "number",
@@ -60,6 +60,13 @@
       "default": "/ship/",
       "sm": 6
     },
+    "serviceName": {
+      "type": "text",
+      "label": "Visible EEBUS/HEMS name",
+      "default": "NexoWatt EOS",
+      "sm": 12,
+      "help": "Name shown by wallboxes during EEBUS/HEMS pairing. The adapter announces this as the local _ship._tcp service instance."
+    },
     "identityHeader": {
       "type": "header",
       "text": "EEBUS identity"
@@ -73,8 +80,9 @@
     "model": {
       "type": "text",
       "label": "Model",
-      "default": "ioBroker EEBUS Adapter",
-      "sm": 6
+      "default": "EOS",
+      "sm": 6,
+      "help": "Default is EOS so wallboxes show the system as NexoWatt EOS."
     },
     "deviceType": {
       "type": "text",

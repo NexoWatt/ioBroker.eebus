@@ -6,6 +6,9 @@ The adapter uses the requested `device -> channel -> state` layout.
 
 ```text
 eebus.0.info.connection
+eebus.0.identity.serviceName
+eebus.0.identity.deviceType
+eebus.0.identity.announcementActive
 eebus.0.identity.localSki
 eebus.0.identity.shipId
 eebus.0.identity.certificateFingerprint

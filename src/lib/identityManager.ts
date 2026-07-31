@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { promisify } from 'node:util';
 import { EebusConfig } from './config';
 import { EebusIdentity } from './eebusTypes';
-import { normalizeHex, sanitizeTxtValue } from './sanitizer';
+import { normalizeHex, sanitizeCertificateSubjectValue } from './sanitizer';
 
 const execFileAsync = promisify(execFile);
 
@@ -58,7 +58,7 @@ export class IdentityManager {
         const workDir = await mkdtemp(join(tmpdir(), 'iobroker-eebus-'));
         const keyFile = join(workDir, 'local.key');
         const certFile = join(workDir, 'local.crt');
-        const subject = `/CN=${sanitizeTxtValue(this.config.model, 'ioBroker-EEBUS')}/O=${sanitizeTxtValue(this.config.brand, 'NexoWatt')}`;
+        const subject = `/CN=${sanitizeCertificateSubjectValue(this.config.serviceName, 'NexoWatt EOS')}/O=${sanitizeCertificateSubjectValue(this.config.brand, 'NexoWatt')}`;
 
         try {
             await execFileAsync('openssl', ['ecparam', '-genkey', '-name', 'prime256v1', '-noout', '-out', keyFile]);

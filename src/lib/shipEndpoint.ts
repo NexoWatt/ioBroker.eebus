@@ -3,6 +3,8 @@ import { AddressInfo } from 'node:net';
 import { EebusConfig } from './config';
 import { EebusIdentity } from './eebusTypes';
 
+const SHIP_WEBSOCKET_PROTOCOL = 'ship';
+
 type MessageCallback = (deviceId: string, message: unknown) => void | Promise<void>;
 
 export class ShipEndpoint {
@@ -21,7 +23,7 @@ export class ShipEndpoint {
 
     public async start(): Promise<boolean> {
         if (!this.config.shipServerEnabled) {
-            this.adapter.log.info('Local SHIP endpoint is disabled.');
+            this.adapter.log.info('Local EOS/HEMS SHIP endpoint is disabled. Wallboxes cannot pair with EOS through EEBUS.');
             return false;
         }
 
@@ -40,9 +42,15 @@ export class ShipEndpoint {
                     cert: this.identity.certificate,
                     requestCert: true,
                     rejectUnauthorized: false,
+                    minVersion: 'TLSv1.2',
                 });
 
-                this.wss = new WebSocketServer({ server: this.server, path: this.config.shipPath });
+                this.wss = new WebSocketServer({
+                    server: this.server,
+                    path: this.config.shipPath,
+                    perMessageDeflate: false,
+                    handleProtocols: protocols => (protocols.has(SHIP_WEBSOCKET_PROTOCOL) ? SHIP_WEBSOCKET_PROTOCOL : false),
+                });
 
                 this.wss.on('connection', (socket: any, request: any) => {
                     const remote = this.getRemoteId(request);
@@ -63,18 +71,18 @@ export class ShipEndpoint {
                 });
 
                 this.server.on('error', (error: Error) => {
-                    this.adapter.log.warn(`Local SHIP endpoint could not listen on port ${this.config.shipPort}: ${error.message}`);
+                    this.adapter.log.warn(`Local EOS/HEMS SHIP endpoint could not listen on port ${this.config.shipPort}: ${error.message}`);
                     resolve(false);
                 });
 
                 this.server.listen(this.config.shipPort, () => {
                     const address = this.server.address() as AddressInfo;
-                    this.adapter.log.info(`Local SHIP endpoint listening on port ${address.port}${this.config.shipPath}`);
+                    this.adapter.log.info(`Local EOS/HEMS SHIP endpoint listening on port ${address.port}${this.config.shipPath}`);
                     this.publishMdnsIfEnabled(address.port);
                     resolve(true);
                 });
             } catch (error) {
-                this.adapter.log.warn(`Local SHIP endpoint could not start: ${String(error)}`);
+                this.adapter.log.warn(`Local EOS/HEMS SHIP endpoint could not start: ${String(error)}`);
                 resolve(false);
             }
         });
@@ -127,6 +135,7 @@ export class ShipEndpoint {
 
     private publishMdnsIfEnabled(port: number): void {
         if (!this.config.announceShipService) {
+            this.adapter.log.warn('Local EOS/HEMS SHIP mDNS announcement is disabled. Remote EEBUS wallboxes cannot discover EOS automatically.');
             return;
         }
 
@@ -134,7 +143,7 @@ export class ShipEndpoint {
             const { Bonjour } = require('bonjour-service');
             this.bonjour = new Bonjour();
             this.advertisement = this.bonjour.publish({
-                name: `${this.config.brand}-${this.config.model}`,
+                name: this.config.serviceName,
                 type: 'ship',
                 protocol: 'tcp',
                 port,
@@ -144,7 +153,7 @@ export class ShipEndpoint {
                     path: this.config.shipPath,
                     ski: this.identity.localSki,
                     register: 'true',
-                    ecc: 'true',
+                    ecc: 'false',
                     brand: this.config.brand,
                     type: this.config.deviceType,
                     model: this.config.model,
@@ -153,9 +162,12 @@ export class ShipEndpoint {
                 },
             });
 
-            this.adapter.log.info('Local SHIP service is announced via mDNS.');
+            this.adapter.log.info(
+                `Local EOS/HEMS SHIP service announced as "${this.config.serviceName}" via _ship._tcp ` +
+                    `(brand=${this.config.brand}, model=${this.config.model}, type=${this.config.deviceType}, ski=${this.identity.localSki}).`,
+            );
         } catch (error) {
-            this.adapter.log.warn(`Could not announce local SHIP service via mDNS: ${String(error)}`);
+            this.adapter.log.warn(`Could not announce local EOS/HEMS SHIP service via mDNS: ${String(error)}`);
         }
     }
 

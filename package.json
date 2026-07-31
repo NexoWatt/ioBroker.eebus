@@ -1,6 +1,6 @@
 {
   "name": "iobroker.eebus",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "NexoWatt EEBUS Adapter for local SHIP/SPINE energy devices",
   "author": "NexoWatt <info@nexowatt.de>",
   "homepage": "https://github.com/NexoWatt/ioBroker.eebus#readme",

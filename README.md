@@ -4,7 +4,7 @@ NexoWatt EEBUS Adapter for ioBroker.
 
 This adapter is a NexoWatt EEBUS adapter prototype for local EEBUS SHIP/SPINE communication with energy devices such as wallboxes, inverters, smart meters, CLS boxes, batteries and grid connection points. It is prepared for publication as the npm package `iobroker.eebus` and for HTTPS-based installation from the GitHub repository.
 
-> Status: initial implementation scaffold. It is designed to be field-tested with real devices before production use.
+> Status: HEMS discovery/announcement implementation scaffold. It is designed to make NexoWatt EOS visible as a local EEBUS Energy Management System for pairing, but full SHIP/SPINE data exchange still requires field testing with real devices.
 
 ## Documentation basis
 
@@ -32,6 +32,7 @@ Implemented in this first repository version:
   - SHA-256 certificate fingerprint
 - protected/encrypted native handling for private key and pairing PIN
 - mDNS browsing for EEBUS `_ship._tcp` and `_shippairing._tcp`
+- mDNS announcement of `NexoWatt EOS` as local `_ship._tcp` HEMS endpoint enabled and enforced for `EnergyManagementSystem` mode
 - optional local TLS/WebSocket SHIP endpoint skeleton
 - device object model:
   - `devices.<deviceId>.info.*`
@@ -57,6 +58,9 @@ Implemented in this first repository version:
 
 | State | Type | Role | Description |
 | --- | --- | --- | --- |
+| `identity.serviceName` | string | `info.name` | Name announced to wallboxes, default `NexoWatt EOS` |
+| `identity.deviceType` | string | `info` | Local EEBUS type, default `EnergyManagementSystem` |
+| `identity.announcementActive` | boolean | `indicator` | Whether the local HEMS mDNS announcement is active |
 | `identity.localSki` | string | `info` | Local EEBUS SKI |
 | `identity.shipId` | string | `info` | Local SHIP ID |
 | `identity.certificateFingerprint` | string | `info` | Local certificate fingerprint |
@@ -132,15 +136,18 @@ The package is published under a proprietary NexoWatt license. Public availabili
 
 Default configuration:
 
+Important: NexoWatt EOS is the Energy Management System / HEMS. For that reason the adapter announces the local SHIP service as `NexoWatt EOS` with `type=EnergyManagementSystem`. In this mode the mDNS announcement is enforced even when an older adapter instance still has the legacy value `announceShipService=false` stored in native configuration.
+
 | Setting | Default | Meaning |
 | --- | ---: | --- |
 | `discoveryEnabled` | `true` | Browse for local EEBUS SHIP services |
 | `measurementIntervalSec` | `10` | Measurement refresh interval |
 | `metadataIntervalSec` | `60` | Metadata refresh interval |
 | `shipServerEnabled` | `true` | Start local TLS/WebSocket SHIP endpoint |
-| `announceShipService` | `false` | Announce local SHIP service via mDNS |
+| `announceShipService` | `true` | Announce EOS as local SHIP/HEMS service via mDNS so wallboxes can discover it; enforced for `EnergyManagementSystem` |
 | `shipPort` | `4712` | Local SHIP endpoint port |
 | `shipPath` | `/ship/` | WebSocket path |
+| `serviceName` | `NexoWatt EOS` | Visible HEMS name announced via `_ship._tcp` |
 | `commandDryRun` | `true` | Record draft command payloads without sending |
 | `allowCommandsToUntrustedDevices` | `false` | Prevent accidental commands to untrusted devices |
 
@@ -149,6 +156,18 @@ Default configuration:
 The default `ianaPen` value is a placeholder (`999999`). Replace it with the real NexoWatt IANA PEN before production use if an official PEN is available.
 
 ## Runtime notes
+
+Expected mDNS announcement for wallbox pairing:
+
+```text
+Service instance: NexoWatt EOS._ship._tcp.local
+TXT txtvers=1
+TXT type=EnergyManagementSystem
+TXT brand=NexoWatt
+TXT model=EOS
+TXT register=true
+TXT ski=<local SKI>
+```
 
 The adapter uses `info.connection` to indicate that the local EEBUS networking subsystem is active. It does not mean that a specific remote device has already completed SHIP/SPINE pairing.
 
@@ -176,7 +195,7 @@ This initial version is intentionally honest about what has and has not been ver
 - Real device communication has not been tested because no real EEBUS logs or payloads were available during implementation.
 - The SHIP endpoint is a TLS/WebSocket skeleton and still needs validation with physical EEBUS devices.
 - SPINE command payloads are draft mappings and must be verified against target device traces.
-- Discovery uses mDNS service data and does not guarantee successful SHIP pairing.
+- Discovery/announcement uses mDNS service data and does not guarantee successful SHIP pairing or full SPINE use-case acceptance.
 - Production use with CLS boxes and grid operator equipment requires additional certification-level testing.
 
 ## Development
