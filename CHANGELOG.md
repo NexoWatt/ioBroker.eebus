@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1 (2026-07-31)
+
+- Enabled JSONConfig internationalization with top-level `i18n: true` so the adapter admin settings follow the ioBroker admin/system language.
+- Added complete German translations for all JSONConfig labels and help texts.
+- Added Weblate-friendly translation files under `admin/i18n/de/translations.json` and `admin/i18n/en/translations.json` while keeping legacy `de.json`/`en.json` files for compatibility.
+
 ## 0.2.0 (2026-07-30)
 
 - Added field-test SHIP session handling:

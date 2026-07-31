@@ -4,7 +4,7 @@ NexoWatt EEBUS Adapter for ioBroker.
 
 This adapter exposes **NexoWatt EOS** as a local EEBUS **Energy Management System / HEMS** and prepares SHIP/SPINE communication with energy devices such as wallboxes, CLS/control boxes, smart meters, grid connection points, PV inverters, batteries, heat pumps and HVAC/climate devices.
 
-> Status: field-test core. Version `0.2.0` contains SHIP session handling, pairing/trust states, SPINE NodeManagement discovery, use-case detection and field-test command mappings. It still needs validation with real EEBUS devices before production or certification-level use.
+> Status: field-test core. Version `0.2.1` enables JSONConfig i18n so the adapter settings follow the ioBroker Admin/system language. It keeps the `0.2.0` SHIP/SPINE field-test core with SHIP session handling, pairing/trust states, SPINE NodeManagement discovery, use-case detection and field-test command mappings. It still needs validation with real EEBUS devices before production or certification-level use.
 
 ## Documentation basis
 
@@ -18,7 +18,7 @@ The implementation was prepared from the EEBUS documentation package supplied to
 
 Public project information is available from the EEBUS Initiative: <https://www.eebus.org/>
 
-## What is implemented in 0.2.0
+## What is implemented in 0.2.1
 
 ### NexoWatt EOS as HEMS
 
@@ -79,6 +79,10 @@ autoAcceptNewDevices = false
 allowCommandsToUntrustedDevices = false
 commandDryRun = true
 ```
+
+### Admin language
+
+The JSONConfig admin page has i18n enabled and provides English and German translations. The ioBroker Admin UI uses the active admin/system language, so German systems show the adapter settings in German.
 
 For controlled lab tests, `pairing.autoAcceptNewDevices` can be enabled. Do not use auto-accept for production.
 

@@ -1,5 +1,6 @@
 {
   "type": "panel",
+  "i18n": true,
   "label": "NexoWatt EEBUS",
   "items": {
     "generalHeader": {

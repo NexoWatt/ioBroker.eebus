@@ -1,6 +1,6 @@
 {
   "name": "iobroker.eebus",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "NexoWatt EEBUS HEMS adapter with SHIP pairing and SPINE field-test core",
   "author": "NexoWatt <info@nexowatt.de>",
   "homepage": "https://github.com/NexoWatt/ioBroker.eebus#readme",
