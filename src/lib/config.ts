@@ -6,6 +6,9 @@ export interface EebusConfig {
     metadataIntervalSec: number;
     shipServerEnabled: boolean;
     announceShipService: boolean;
+    autoConnectEnabled: boolean;
+    shipHandshakeEnabled: boolean;
+    spineDiscoveryEnabled: boolean;
     shipPort: number;
     shipPath: string;
     serviceName: string;
@@ -20,6 +23,7 @@ export interface EebusConfig {
     shipId: string;
     localSki: string;
     certificateFingerprint: string;
+    autoAcceptNewDevices: boolean;
     allowCommandsToUntrustedDevices: boolean;
     commandDryRun: boolean;
     debugRawMessages: boolean;
@@ -55,6 +59,9 @@ export function getConfig(native: Record<string, unknown>): EebusConfig {
         // NexoWatt EOS is the HEMS. While it advertises as EnergyManagementSystem, mDNS announcement must stay active
         // so wallboxes can show it in their EEBUS/HEMS pairing list, even if an older native config contains false.
         announceShipService: deviceType === DEFAULT_DEVICE_TYPE ? true : toBoolean(native.announceShipService, true),
+        autoConnectEnabled: toBoolean(native.autoConnectEnabled, true),
+        shipHandshakeEnabled: toBoolean(native.shipHandshakeEnabled, true),
+        spineDiscoveryEnabled: toBoolean(native.spineDiscoveryEnabled, true),
         shipPort: Math.min(65535, Math.max(1024, toNumber(native.shipPort, 4712))),
         shipPath,
         serviceName,
@@ -69,6 +76,7 @@ export function getConfig(native: Record<string, unknown>): EebusConfig {
         shipId: String(native.shipId || ''),
         localSki: String(native.localSki || ''),
         certificateFingerprint: String(native.certificateFingerprint || ''),
+        autoAcceptNewDevices: toBoolean(native.autoAcceptNewDevices, false),
         allowCommandsToUntrustedDevices: toBoolean(native.allowCommandsToUntrustedDevices, false),
         commandDryRun: toBoolean(native.commandDryRun, true),
         debugRawMessages: toBoolean(native.debugRawMessages, false),

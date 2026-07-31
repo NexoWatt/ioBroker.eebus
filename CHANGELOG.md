@@ -1,21 +1,35 @@
 # Changelog
 
-## 0.1.2
+## 0.2.0 (2026-07-30)
 
-- Announce the local SHIP service with the visible service instance name `NexoWatt EOS`.
-- Set the default EEBUS model to `EOS` and keep the default device type as `EnergyManagementSystem`.
-- Enforce SHIP mDNS announcement while running in `EnergyManagementSystem` mode so old instances with `announceShipService=false` still become visible for wallbox pairing.
-- Add identity states for `serviceName`, `deviceType` and `announcementActive`.
-- Use the SHIP WebSocket subprotocol `ship` and disable WebSocket compression for the local endpoint scaffold.
-- Preserve spaces in SHIP TXT values while respecting the SHIP TXT size limits.
+- Added field-test SHIP session handling:
+  - CMI frame exchange
+  - Hello pending/ready handling
+  - protocol handshake with JSON-UTF8
+  - PIN state/input handling
+  - SHIP data-exchange state tracking
+- Added outgoing SHIP client connections to discovered `_ship._tcp` devices.
+- Added incoming SHIP pairing state exposure for wallboxes that actively connect to NexoWatt EOS.
+- Added pairing/trust workflow states, including per-device approve/reject buttons and global field-test auto-accept.
+- Added SPINE data wrapper support for `ee1.0` payloads.
+- Added SPINE NodeManagement detailed discovery read request after SHIP data exchange is ready.
+- Added generic SPINE parser for feature/use-case extraction and basic measurement mapping.
+- Added device-class detection for wallbox, CLS/control box, smart meter, grid connection, inverter, battery, heat pump, HVAC and climate devices.
+- Added field-test command datagram generation for LoadControl, power limits, setpoint power and HVAC setpoints.
+- Extended object model with `connection.*`, `useCases.*`, additional `measurements.*`, and richer `pairing.*` diagnostics.
+- Kept write commands in dry-run mode by default; read-only NodeManagement discovery is sent when a SHIP data-exchange session exists.
 
-## 0.1.1
+## 0.1.2 (2026-07-30)
 
-- Enable local SHIP mDNS announcement by default so EEBUS wallboxes can discover EOS as HEMS.
-- Add warning log when mDNS announcement is disabled.
-- Correct SHIP TXT `ecc` value to `false` because the current identity generation only uses secp256r1.
+- Announce NexoWatt EOS as visible local HEMS / EnergyManagementSystem via mDNS.
+- Enforce mDNS announcement in EnergyManagementSystem mode even when older native config contains `announceShipService=false`.
+- Improve WebSocket setup for SHIP field tests.
 
-## 0.1.0
+## 0.1.1 (2026-07-30)
+
+- Enable local SHIP mDNS announcement by default.
+- Correct TXT `ecc=false` for the current secp256r1-only identity.
+
+## 0.1.0 (2026-07-30)
 
 - Initial NexoWatt EEBUS adapter scaffold.
-- Added local SHIP identity generation, mDNS discovery, SHIP endpoint scaffold and ioBroker object model.

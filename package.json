@@ -1,7 +1,7 @@
 {
   "name": "iobroker.eebus",
-  "version": "0.1.2",
-  "description": "NexoWatt EEBUS Adapter for local SHIP/SPINE energy devices",
+  "version": "0.2.0",
+  "description": "NexoWatt EEBUS HEMS adapter with SHIP pairing and SPINE field-test core",
   "author": "NexoWatt <info@nexowatt.de>",
   "homepage": "https://github.com/NexoWatt/ioBroker.eebus#readme",
   "repository": {
@@ -15,16 +15,22 @@
   "main": "build/main.js",
   "types": "build/main.d.ts",
   "keywords": [
-    "iobroker",
-    "eebus",
-    "ship",
-    "spine",
-    "energy",
-    "wallbox",
-    "inverter",
-    "smart-meter",
+    "climate",
+    "cls",
     "cls-box",
-    "nexowatt"
+    "control-box",
+    "eebus",
+    "energy",
+    "heat-pump",
+    "hems",
+    "hvac",
+    "inverter",
+    "iobroker",
+    "nexowatt",
+    "ship",
+    "smart-meter",
+    "spine",
+    "wallbox"
   ],
   "engines": {
     "node": ">=20"
@@ -35,7 +41,8 @@
     "io-package.json",
     "LICENSE",
     "README.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "docs"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"

@@ -2,119 +2,181 @@
 
 NexoWatt EEBUS Adapter for ioBroker.
 
-This adapter is a NexoWatt EEBUS adapter prototype for local EEBUS SHIP/SPINE communication with energy devices such as wallboxes, inverters, smart meters, CLS boxes, batteries and grid connection points. It is prepared for publication as the npm package `iobroker.eebus` and for HTTPS-based installation from the GitHub repository.
+This adapter exposes **NexoWatt EOS** as a local EEBUS **Energy Management System / HEMS** and prepares SHIP/SPINE communication with energy devices such as wallboxes, CLS/control boxes, smart meters, grid connection points, PV inverters, batteries, heat pumps and HVAC/climate devices.
 
-> Status: HEMS discovery/announcement implementation scaffold. It is designed to make NexoWatt EOS visible as a local EEBUS Energy Management System for pairing, but full SHIP/SPINE data exchange still requires field testing with real devices.
+> Status: field-test core. Version `0.2.0` contains SHIP session handling, pairing/trust states, SPINE NodeManagement discovery, use-case detection and field-test command mappings. It still needs validation with real EEBUS devices before production or certification-level use.
 
 ## Documentation basis
 
-The first implementation was prepared from the EEBUS documentation package supplied to the project, especially:
+The implementation was prepared from the EEBUS documentation package supplied to the project, especially:
 
 - EEBus SHIP Technical Specification v1.1.0
 - EEBus SHIP Pairing Service Technical Specification v1.0.0
 - EEBus SPINE v1.3.0
 - EEBus SHIP Requirements for Installation Process v1.1.0
-- Use cases for EV charging, battery control, grid connection point monitoring, inverter monitoring, power limitation and PV/battery visualization
+- Use cases for EV charging, battery control, grid connection point monitoring, inverter monitoring, HVAC / heat pumps, power limitation and PV/battery visualization
 
 Public project information is available from the EEBUS Initiative: <https://www.eebus.org/>
 
-## Features
+## What is implemented in 0.2.0
 
-Implemented in this first repository version:
+### NexoWatt EOS as HEMS
 
-- ioBroker TypeScript adapter structure
-- JSONConfig admin UI
-- local SHIP identity generation:
-  - secp256r1 private key via OpenSSL
-  - self-signed X.509 certificate
-  - stable SHIP ID
-  - local SKI
-  - SHA-256 certificate fingerprint
-- protected/encrypted native handling for private key and pairing PIN
-- mDNS browsing for EEBUS `_ship._tcp` and `_shippairing._tcp`
-- mDNS announcement of `NexoWatt EOS` as local `_ship._tcp` HEMS endpoint enabled and enforced for `EnergyManagementSystem` mode
-- optional local TLS/WebSocket SHIP endpoint skeleton
-- device object model:
-  - `devices.<deviceId>.info.*`
-  - `devices.<deviceId>.measurements.*`
-  - `devices.<deviceId>.control.*`
-  - `devices.<deviceId>.limits.*`
-  - `devices.<deviceId>.pairing.*`
-  - `devices.<deviceId>.raw.*`
-- command routing scaffold for:
-  - `enableCharging`
-  - `maxChargingPower`
-  - `maxChargingCurrent`
-  - `activePowerLimit`
-  - `setpointPower`
-- conservative command behavior:
-  - commands are not sent to untrusted devices by default
-  - command dry-run is enabled by default
-  - draft SPINE command envelopes are written to `raw.lastCommand`
+The adapter announces the local SHIP service as:
+
+```text
+NexoWatt EOS._ship._tcp.local
+TXT type=EnergyManagementSystem
+TXT brand=NexoWatt
+TXT model=EOS
+TXT register=true
+```
+
+This is required so EEBUS wallboxes can show NexoWatt EOS in their HEMS pairing list.
+
+### Local EEBUS identity
+
+The adapter generates and persists a local EEBUS/SHIP identity on first start:
+
+- secp256r1 private key via OpenSSL
+- self-signed X.509 certificate
+- local SKI
+- stable SHIP ID
+- SHA-256 certificate fingerprint
+
+The SKI, SHIP ID and fingerprint are exposed under `identity.*`.
+
+### SHIP field-test session handling
+
+The adapter now contains a first SHIP state machine for field tests:
+
+- TLS/WebSocket endpoint using protocol `ship`
+- outgoing client connection to discovered SHIP devices
+- CMI frame exchange
+- Hello pending/ready handling
+- protocol handshake with SHIP `1.1` and `JSON-UTF8`
+- optional PIN input handling
+- data-exchange readiness state
+- connection diagnostics per device
+
+### Pairing / trust workflow
+
+Each device gets:
+
+```text
+devices.<id>.pairing.trusted
+devices.<id>.pairing.approve
+devices.<id>.pairing.reject
+devices.<id>.pairing.pairingState
+devices.<id>.pairing.remoteSki
+devices.<id>.pairing.remoteFingerprint
+```
+
+The default mode is conservative:
+
+```text
+autoAcceptNewDevices = false
+allowCommandsToUntrustedDevices = false
+commandDryRun = true
+```
+
+For controlled lab tests, `pairing.autoAcceptNewDevices` can be enabled. Do not use auto-accept for production.
+
+### SPINE discovery and parser
+
+After SHIP data exchange is ready, the adapter sends a read-only SPINE NodeManagement detailed discovery request. This request is sent even when `commandDryRun` is enabled because it is required to identify the device and its supported functions.
+
+The adapter parses incoming SPINE payloads to extract:
+
+- device types
+- feature types
+- supported functions
+- use cases / specific usage where available
+- basic measurements
+
+### Device classes
+
+The adapter can classify devices as:
+
+```text
+wallbox
+clsBox
+smartMeter
+gridConnection
+inverter
+battery
+heatPump
+hvac
+climate
+unknown
+```
+
+This allows EOS to prepare the correct object model even before manufacturer-specific details are added.
 
 ## Object model
 
-### Identity
-
-| State | Type | Role | Description |
-| --- | --- | --- | --- |
-| `identity.serviceName` | string | `info.name` | Name announced to wallboxes, default `NexoWatt EOS` |
-| `identity.deviceType` | string | `info` | Local EEBUS type, default `EnergyManagementSystem` |
-| `identity.announcementActive` | boolean | `indicator` | Whether the local HEMS mDNS announcement is active |
-| `identity.localSki` | string | `info` | Local EEBUS SKI |
-| `identity.shipId` | string | `info` | Local SHIP ID |
-| `identity.certificateFingerprint` | string | `info` | Local certificate fingerprint |
-
-### Discovery
-
-| State | Type | Role | Description |
-| --- | --- | --- | --- |
-| `discovery.enabled` | boolean | `switch.enable` | Discovery configuration state |
-| `discovery.discoveredCount` | number | `value` | Number of currently known discovered nodes |
-| `discovery.lastDiscovery` | string | `json` | Last raw discovery event |
-
-### Device states
-
-Each discovered device gets this structure:
+Base structure:
 
 ```text
-devices.<deviceId>.info.*
-devices.<deviceId>.measurements.*
-devices.<deviceId>.control.*
-devices.<deviceId>.limits.*
-devices.<deviceId>.pairing.*
-devices.<deviceId>.raw.*
+eebus.0.identity.*
+eebus.0.discovery.*
+eebus.0.pairing.*
+eebus.0.devices.<deviceId>.info.*
+eebus.0.devices.<deviceId>.connection.*
+eebus.0.devices.<deviceId>.measurements.*
+eebus.0.devices.<deviceId>.control.*
+eebus.0.devices.<deviceId>.limits.*
+eebus.0.devices.<deviceId>.pairing.*
+eebus.0.devices.<deviceId>.useCases.*
+eebus.0.devices.<deviceId>.raw.*
 ```
 
-Read-only measurement and information states:
+Important connection states:
 
 ```text
-online
-manufacturer
-model
-serialNumber
-ski
-deviceType
-shipId
-power
-energy
-voltage
-current
-frequency
-soc
-chargingState
+devices.<id>.connection.shipState
+devices.<id>.connection.connected
+devices.<id>.connection.dataExchangeReady
+devices.<id>.connection.lastError
 ```
 
-Writable control and limit states:
+Important use-case states:
 
 ```text
-enableCharging
-maxChargingPower
-maxChargingCurrent
-activePowerLimit
-setpointPower
-pairing.trusted
+devices.<id>.useCases.detected
+devices.<id>.useCases.features
+devices.<id>.useCases.functions
+devices.<id>.useCases.nodeManagement
+devices.<id>.useCases.supportedDeviceClasses
 ```
+
+Writable control/limit states include:
+
+```text
+control.enableCharging
+control.maxChargingPower
+control.maxChargingCurrent
+control.targetTemperature
+control.hvacMode
+limits.activePowerLimit
+limits.consumptionLimit
+limits.productionLimit
+limits.gridImportLimit
+limits.gridExportLimit
+limits.heatPumpPowerLimit
+```
+
+## Field-test workflow
+
+1. Install the adapter.
+2. Start the adapter and verify that `NexoWatt EOS` is visible via `_ship._tcp`.
+3. Start EEBUS/HEMS pairing on the wallbox or another EEBUS device.
+4. Watch `devices.<id>.pairing.pairingState`.
+5. Approve the device with `devices.<id>.pairing.approve = true` or set `devices.<id>.pairing.trusted = true`.
+6. Wait until `devices.<id>.connection.dataExchangeReady = true`.
+7. Check `devices.<id>.useCases.*` and `devices.<id>.raw.lastSpineFrame`.
+8. Keep `commandDryRun = true` until the SPINE command payloads have been verified with the real device.
+9. Disable `commandDryRun` only for controlled tests after pairing and NodeManagement discovery work.
 
 ## Installation
 
@@ -124,7 +186,7 @@ After publication to the npm registry:
 npm install iobroker.eebus
 ```
 
-For ioBroker systems, install the adapter through the ioBroker admin interface or CLI once the package is available. During development or controlled rollout, the repository can also be installed via HTTPS:
+During development or controlled rollout, the repository can also be installed via HTTPS:
 
 ```bash
 npm install git+https://github.com/NexoWatt/ioBroker.eebus.git
@@ -132,75 +194,37 @@ npm install git+https://github.com/NexoWatt/ioBroker.eebus.git
 
 The package is published under a proprietary NexoWatt license. Public availability of the package does not grant third-party usage, copying, modification, redistribution or sublicensing rights.
 
-## Configuration
+## Quick network check
 
-Default configuration:
+On the EOS system:
 
-Important: NexoWatt EOS is the Energy Management System / HEMS. For that reason the adapter announces the local SHIP service as `NexoWatt EOS` with `type=EnergyManagementSystem`. In this mode the mDNS announcement is enforced even when an older adapter instance still has the legacy value `announceShipService=false` stored in native configuration.
-
-| Setting | Default | Meaning |
-| --- | ---: | --- |
-| `discoveryEnabled` | `true` | Browse for local EEBUS SHIP services |
-| `measurementIntervalSec` | `10` | Measurement refresh interval |
-| `metadataIntervalSec` | `60` | Metadata refresh interval |
-| `shipServerEnabled` | `true` | Start local TLS/WebSocket SHIP endpoint |
-| `announceShipService` | `true` | Announce EOS as local SHIP/HEMS service via mDNS so wallboxes can discover it; enforced for `EnergyManagementSystem` |
-| `shipPort` | `4712` | Local SHIP endpoint port |
-| `shipPath` | `/ship/` | WebSocket path |
-| `serviceName` | `NexoWatt EOS` | Visible HEMS name announced via `_ship._tcp` |
-| `commandDryRun` | `true` | Record draft command payloads without sending |
-| `allowCommandsToUntrustedDevices` | `false` | Prevent accidental commands to untrusted devices |
-
-### IANA PEN
-
-The default `ianaPen` value is a placeholder (`999999`). Replace it with the real NexoWatt IANA PEN before production use if an official PEN is available.
-
-## Runtime notes
-
-Expected mDNS announcement for wallbox pairing:
-
-```text
-Service instance: NexoWatt EOS._ship._tcp.local
-TXT txtvers=1
-TXT type=EnergyManagementSystem
-TXT brand=NexoWatt
-TXT model=EOS
-TXT register=true
-TXT ski=<local SKI>
+```bash
+sudo apt install avahi-utils
+avahi-browse -rt _ship._tcp
 ```
 
-The adapter uses `info.connection` to indicate that the local EEBUS networking subsystem is active. It does not mean that a specific remote device has already completed SHIP/SPINE pairing.
-
-Device-level availability is exposed via:
+Expected service:
 
 ```text
-devices.<deviceId>.info.online
+NexoWatt EOS._ship._tcp.local
 ```
 
-## Pairing and trust
+If the device cannot see EOS:
 
-This version contains a conservative trust model:
-
-1. Devices are discovered through mDNS.
-2. The remote SHIP ID and SKI are stored under `devices.<deviceId>.pairing.*`.
-3. The user or a later pairing workflow must set `devices.<deviceId>.pairing.trusted` to `true`.
-4. Commands are blocked unless the device is trusted or the advanced option `allowCommandsToUntrustedDevices` is enabled.
-
-This is not yet a fully certified EEBUS pairing implementation.
+- EOS and the device must be in the same LAN/VLAN or mDNS must be relayed.
+- UDP 5353 multicast must not be blocked.
+- TCP port 4712 must be reachable from the EEBUS device.
+- Guest Wi-Fi / client isolation must be disabled.
 
 ## Known limitations
 
-This initial version is intentionally honest about what has and has not been verified:
-
-- Real device communication has not been tested because no real EEBUS logs or payloads were available during implementation.
-- The SHIP endpoint is a TLS/WebSocket skeleton and still needs validation with physical EEBUS devices.
-- SPINE command payloads are draft mappings and must be verified against target device traces.
-- Discovery/announcement uses mDNS service data and does not guarantee successful SHIP pairing or full SPINE use-case acceptance.
-- Production use with CLS boxes and grid operator equipment requires additional certification-level testing.
+- This version is not a certified EEBUS stack.
+- Real device communication still needs validation with wallboxes, CLS/control boxes, smart meters, PV/battery devices and HVAC equipment.
+- SPINE write mappings are field-test payloads and may need per-device feature addressing, limit IDs, selectors or bindings learned from NodeManagement discovery.
+- Production use with grid operator equipment / CLS boxes requires additional verification, audit logs and certification-level testing.
+- EEBUS devices differ in their supported use cases; EEBUS-compatible does not automatically mean every function is available.
 
 ## Development
-
-Recommended development flow:
 
 ```bash
 npm install

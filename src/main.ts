@@ -34,7 +34,8 @@ class EebusAdapter extends utils.Adapter {
 
             this.subscribeStates('devices.*.control.*');
             this.subscribeStates('devices.*.limits.*');
-            this.subscribeStates('devices.*.pairing.trusted');
+            this.subscribeStates('devices.*.pairing.*');
+            this.subscribeStates('pairing.autoAcceptNewDevices');
 
             this.log.info('NexoWatt EEBUS adapter started.');
         } catch (error) {
@@ -59,7 +60,8 @@ class EebusAdapter extends utils.Adapter {
         try {
             this.unsubscribeStates('devices.*.control.*');
             this.unsubscribeStates('devices.*.limits.*');
-            this.unsubscribeStates('devices.*.pairing.trusted');
+            this.unsubscribeStates('devices.*.pairing.*');
+            this.unsubscribeStates('pairing.autoAcceptNewDevices');
 
             await this.runtime?.stop();
             this.runtime = undefined;

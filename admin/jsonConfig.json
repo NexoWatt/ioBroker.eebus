@@ -12,6 +12,12 @@
       "default": true,
       "help": "Browses local _ship._tcp and _shippairing._tcp services."
     },
+    "autoConnectEnabled": {
+      "type": "checkbox",
+      "label": "Auto-connect discovered SHIP devices",
+      "default": true,
+      "help": "Opens a field-test SHIP WebSocket session to discovered devices where possible."
+    },
     "measurementIntervalSec": {
       "type": "number",
       "label": "Measurement polling interval",
@@ -38,13 +44,25 @@
       "type": "checkbox",
       "label": "Enable local TLS/WebSocket SHIP endpoint",
       "default": true,
-      "help": "Starts a local /ship/ endpoint. Full SHIP/SPINE certification still requires device tests."
+      "help": "Starts a local /ship/ endpoint so wallboxes and other devices can pair with NexoWatt EOS."
     },
     "announceShipService": {
       "type": "checkbox",
       "label": "Announce local SHIP service via mDNS",
       "default": true,
       "help": "Required when wallboxes or other EEBUS devices should discover EOS as local HEMS automatically via _ship._tcp. In EnergyManagementSystem mode this is enforced by the adapter."
+    },
+    "shipHandshakeEnabled": {
+      "type": "checkbox",
+      "label": "Enable SHIP handshake state machine",
+      "default": true,
+      "help": "Enables CMI, Hello, protocol handshake and PIN-state handling for field tests."
+    },
+    "spineDiscoveryEnabled": {
+      "type": "checkbox",
+      "label": "Request SPINE NodeManagement discovery",
+      "default": true,
+      "help": "After SHIP data exchange is ready, the adapter sends a read-only NodeManagement detailed discovery request. This is not blocked by command dry run."
     },
     "shipPort": {
       "type": "number",
@@ -145,6 +163,16 @@
       "sm": 12,
       "help": "Protected/encrypted. Leave empty to generate a local private key on first start."
     },
+    "pairingHeader": {
+      "type": "header",
+      "text": "Pairing / field tests"
+    },
+    "autoAcceptNewDevices": {
+      "type": "checkbox",
+      "label": "Auto accept new devices for field testing",
+      "default": false,
+      "help": "Only for controlled lab tests. New SHIP peers are trusted automatically and Hello continues immediately."
+    },
     "commandsHeader": {
       "type": "header",
       "text": "Commands"
@@ -159,7 +187,7 @@
       "type": "checkbox",
       "label": "Command dry run",
       "default": true,
-      "help": "Records draft SPINE command payloads without sending them. Disable only after field validation."
+      "help": "Records field-test SPINE command payloads without sending them. Disable only after pairing/data exchange was verified."
     },
     "debugRawMessages": {
       "type": "checkbox",

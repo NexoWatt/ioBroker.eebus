@@ -1,68 +1,42 @@
 # Implementation notes
 
-## Creator note
+## Status
 
-The project is structured to follow the current ioBroker adapter creator output style. In the build environment used for the first ZIP, `npx @iobroker/create-adapter@latest` could not complete because the npm registry host was not resolvable. Therefore the repository was created manually in a creator-compatible structure.
-
-## EEBUS identity
-
-The adapter generates and persists these values on first start:
-
-- certificate
-- private key
-- SHIP ID
-- local SKI
-- certificate fingerprint
-
-The private key and pairing PIN are listed in `encryptedNative`. The certificate, private key and pairing PIN are listed in `protectedNative`.
-
-## SHIP TXT data
-
-`announceShipService` is enabled by default because external devices such as wallboxes need the EOS HEMS endpoint to be visible via `_ship._tcp` mDNS discovery.
-
-When `announceShipService` is enabled, the local mDNS TXT record contains:
-
-```text
-txtvers
-id
-path
-ski
-register
-ecc
-brand
-type
-model
-serial
-cat
-```
-
-## Current protocol level
+Version `0.2.0` is a field-test core. It is intended to be installed on NexoWatt EOS and tested with real EEBUS devices.
 
 Implemented:
 
-- local identity creation
-- mDNS discovery
-- TLS/WebSocket endpoint scaffold
-- raw message capture
-- command draft generation
+- mDNS/DNS-SD discovery and announcement.
+- Local SHIP TLS/WebSocket endpoint.
+- Outgoing SHIP client connections.
+- CMI frame exchange.
+- Hello pending/ready workflow.
+- Protocol handshake with JSON-UTF8.
+- PIN state/input handling.
+- Per-device pairing/trust states.
+- SPINE data wrapper with protocolId `ee1.0`.
+- NodeManagement detailed discovery read request.
+- Generic parser for feature types, functions, use cases and basic measurement values.
+- Field-test command datagrams for selected LoadControl, PowerSequences, Setpoint and HVAC commands.
 
-Not yet complete:
+Not yet verified:
 
-- certified SHIP handshake state machine
-- complete SPINE feature/entity addressing
-- final device-specific command payloads
-- tested CLS/grid operator workflow
+- Real device acceptance of the generated SHIP session sequence.
+- Vendor-specific NodeManagement response formats.
+- Feature addressing for write commands.
+- Limit IDs, selectors and bindings for wallboxes, CLS boxes, smart meters, heat pumps and battery/inverter devices.
+- Certification-level interoperability.
 
-## 0.1.2 HEMS visibility fix
+## Creator note
 
-NexoWatt EOS is the local Energy Management System. Therefore the adapter now announces the local SHIP service as a user-visible HEMS endpoint:
+The initial container environment could not resolve the npm registry when the project was first created, so the repository was built in a creator-like modern ioBroker TypeScript structure and then kept aligned with current ioBroker metadata patterns.
+
+## Safety defaults
 
 ```text
-NexoWatt EOS._ship._tcp.local
-TXT type=EnergyManagementSystem
-TXT brand=NexoWatt
-TXT model=EOS
-TXT register=true
+autoAcceptNewDevices = false
+allowCommandsToUntrustedDevices = false
+commandDryRun = true
 ```
 
-The announcement is enforced while `deviceType` is `EnergyManagementSystem`, because older ioBroker native configurations can keep a stored `announceShipService=false` value after an update. Without the local `_ship._tcp` announcement, a wallbox can run its EEBUS/HEMS search but will not display NexoWatt EOS in the pairing list.
+Read-only NodeManagement discovery is allowed after SHIP data exchange because the adapter needs it for automatic device classification.

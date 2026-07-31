@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/ioBroker/ioBroker.js-controller/master/schemas/io-package.json",
   "common": {
     "name": "eebus",
-    "version": "0.1.2",
+    "version": "0.2.0",
     "titleLang": {
       "en": "NexoWatt EEBUS Adapter",
       "de": "NexoWatt EEBUS Adapter",
@@ -17,31 +17,37 @@
       "zh-cn": "NexoWatt EEBUS 适配器"
     },
     "desc": {
-      "en": "Connect local EEBUS SHIP/SPINE energy devices such as wallboxes, inverters, smart meters and CLS boxes.",
-      "de": "Verbindet lokale EEBUS SHIP/SPINE-Energiegeräte wie Wallboxen, Wechselrichter, Smart Meter und CLS-Boxen.",
-      "ru": "Подключает локальные энергетические устройства EEBUS SHIP/SPINE, такие как зарядные станции, инверторы, интеллектуальные счетчики и CLS-боксы.",
-      "pt": "Liga dispositivos de energia EEBUS SHIP/SPINE locais, como wallboxes, inversores, contadores inteligentes e caixas CLS.",
-      "nl": "Verbindt lokale EEBUS SHIP/SPINE-energieapparaten zoals wallboxen, omvormers, slimme meters en CLS-boxen.",
-      "fr": "Connecte des appareils énergétiques locaux EEBUS SHIP/SPINE comme les bornes de recharge, onduleurs, compteurs intelligents et boîtiers CLS.",
-      "it": "Collega dispositivi energetici locali EEBUS SHIP/SPINE come wallbox, inverter, smart meter e box CLS.",
-      "es": "Conecta dispositivos energéticos locales EEBUS SHIP/SPINE como cargadores, inversores, contadores inteligentes y cajas CLS.",
-      "pl": "Łączy lokalne urządzenia energetyczne EEBUS SHIP/SPINE, takie jak wallboxy, falowniki, inteligentne liczniki i skrzynki CLS.",
-      "uk": "Підключає локальні енергетичні пристрої EEBUS SHIP/SPINE, такі як зарядні станції, інвертори, розумні лічильники та CLS-бокси.",
-      "zh-cn": "连接本地 EEBUS SHIP/SPINE 能源设备，例如壁挂式充电桩、逆变器、智能电表和 CLS 盒。"
+      "en": "Connect local EEBUS SHIP/SPINE devices and expose NexoWatt EOS as HEMS with SHIP pairing, SPINE discovery and field-test mappings for wallboxes, CLS boxes, smart meters, PV, batteries and HVAC.",
+      "de": "Verbindet lokale EEBUS SHIP/SPINE-Geräte und stellt NexoWatt EOS als HEMS mit SHIP-Pairing, SPINE-Erkennung und Feldtest-Mappings für Wallboxen, CLS-Boxen, Smart Meter, PV, Speicher und HVAC bereit.",
+      "ru": "Connect local EEBUS SHIP/SPINE devices and expose NexoWatt EOS as HEMS with SHIP pairing, SPINE discovery and field-test mappings for wallboxes, CLS boxes, smart meters, PV, batteries and HVAC.",
+      "pt": "Connect local EEBUS SHIP/SPINE devices and expose NexoWatt EOS as HEMS with SHIP pairing, SPINE discovery and field-test mappings for wallboxes, CLS boxes, smart meters, PV, batteries and HVAC.",
+      "nl": "Connect local EEBUS SHIP/SPINE devices and expose NexoWatt EOS as HEMS with SHIP pairing, SPINE discovery and field-test mappings for wallboxes, CLS boxes, smart meters, PV, batteries and HVAC.",
+      "fr": "Connect local EEBUS SHIP/SPINE devices and expose NexoWatt EOS as HEMS with SHIP pairing, SPINE discovery and field-test mappings for wallboxes, CLS boxes, smart meters, PV, batteries and HVAC.",
+      "it": "Connect local EEBUS SHIP/SPINE devices and expose NexoWatt EOS as HEMS with SHIP pairing, SPINE discovery and field-test mappings for wallboxes, CLS boxes, smart meters, PV, batteries and HVAC.",
+      "es": "Connect local EEBUS SHIP/SPINE devices and expose NexoWatt EOS as HEMS with SHIP pairing, SPINE discovery and field-test mappings for wallboxes, CLS boxes, smart meters, PV, batteries and HVAC.",
+      "pl": "Connect local EEBUS SHIP/SPINE devices and expose NexoWatt EOS as HEMS with SHIP pairing, SPINE discovery and field-test mappings for wallboxes, CLS boxes, smart meters, PV, batteries and HVAC.",
+      "uk": "Connect local EEBUS SHIP/SPINE devices and expose NexoWatt EOS as HEMS with SHIP pairing, SPINE discovery and field-test mappings for wallboxes, CLS boxes, smart meters, PV, batteries and HVAC.",
+      "zh-cn": "Connect local EEBUS SHIP/SPINE devices and expose NexoWatt EOS as HEMS with SHIP pairing, SPINE discovery and field-test mappings for wallboxes, CLS boxes, smart meters, PV, batteries and HVAC."
     },
     "authors": [
       "NexoWatt <info@nexowatt.de>"
     ],
     "keywords": [
-      "eebus",
-      "ship",
-      "spine",
-      "energy",
-      "wallbox",
-      "inverter",
-      "smart-meter",
+      "climate",
+      "cls",
       "cls-box",
-      "nexowatt"
+      "control-box",
+      "eebus",
+      "energy",
+      "heat-pump",
+      "hems",
+      "hvac",
+      "inverter",
+      "nexowatt",
+      "ship",
+      "smart-meter",
+      "spine",
+      "wallbox"
     ],
     "licenseInformation": {
       "type": "limited",
@@ -93,7 +99,7 @@
     "shipPort": 4712,
     "shipPath": "/ship/",
     "brand": "NexoWatt",
-    "model": "ioBroker EEBUS Adapter",
+    "model": "EOS",
     "deviceType": "EnergyManagementSystem",
     "deviceCategories": "2",
     "ianaPen": "999999",
@@ -105,7 +111,12 @@
     "certificateFingerprint": "",
     "allowCommandsToUntrustedDevices": false,
     "commandDryRun": true,
-    "debugRawMessages": false
+    "debugRawMessages": false,
+    "serviceName": "NexoWatt EOS",
+    "autoConnectEnabled": true,
+    "shipHandshakeEnabled": true,
+    "spineDiscoveryEnabled": true,
+    "autoAcceptNewDevices": false
   },
   "objects": [],
   "instanceObjects": [

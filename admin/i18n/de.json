@@ -25,5 +25,11 @@
   "Commands": "Befehle",
   "Allow commands to untrusted devices": "Befehle an nicht vertrauenswürdige Geräte erlauben",
   "Command dry run": "Befehle nur simulieren",
-  "Store raw diagnostic messages": "Raw-Diagnosenachrichten speichern"
+  "Store raw diagnostic messages": "Raw-Diagnosenachrichten speichern",
+  "Auto-connect discovered SHIP devices": "Gefundene SHIP-Geräte automatisch verbinden",
+  "Enable SHIP handshake state machine": "SHIP-Handshake-State-Machine aktivieren",
+  "Request SPINE NodeManagement discovery": "SPINE-NodeManagement-Discovery anfordern",
+  "Visible EEBUS/HEMS name": "Sichtbarer EEBUS/HEMS-Name",
+  "Pairing / field tests": "Pairing / Feldtests",
+  "Auto accept new devices for field testing": "Neue Geräte für Feldtests automatisch akzeptieren"
 }
