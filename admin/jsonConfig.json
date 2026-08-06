@@ -1,7 +1,7 @@
 {
   "type": "panel",
   "i18n": true,
-  "label": "NexoWatt EEBUS",
+  "label": "NexoWatt EOS - EEBUS",
   "items": {
     "generalHeader": {
       "type": "header",
@@ -81,65 +81,74 @@
     },
     "serviceName": {
       "type": "text",
-      "label": "Visible EEBUS/HEMS name",
+      "label": "Pairing name visible on the device",
       "default": "NexoWatt EOS",
       "sm": 12,
-      "help": "Name shown by wallboxes during EEBUS/HEMS pairing. The adapter announces this as the local _ship._tcp service instance."
+      "help": "This is the name shown by wallboxes, heat pumps and other EEBUS devices during HEMS pairing. Keep the default NexoWatt EOS unless multiple EOS systems share one network."
     },
     "identityHeader": {
       "type": "header",
-      "text": "EEBUS identity"
+      "text": "NexoWatt EOS EEBUS identity"
     },
     "brand": {
       "type": "text",
       "label": "Brand",
       "default": "NexoWatt",
-      "sm": 6
+      "sm": 6,
+      "readOnly": true,
+      "help": "Fixed EEBUS brand identity: NexoWatt."
     },
     "model": {
       "type": "text",
       "label": "Model",
       "default": "EOS",
       "sm": 6,
-      "help": "Default is EOS so wallboxes show the system as NexoWatt EOS."
+      "help": "Fixed EEBUS product model: EOS. Legacy values such as EEBUS Adapter are migrated automatically.",
+      "readOnly": true
     },
     "deviceType": {
       "type": "text",
       "label": "Device type",
       "default": "EnergyManagementSystem",
-      "sm": 6
+      "sm": 6,
+      "readOnly": true,
+      "help": "Fixed protocol-facing device type: EnergyManagementSystem. This identifies NexoWatt EOS as the local HEMS."
     },
     "deviceCategories": {
       "type": "text",
       "label": "SHIP device categories",
       "default": "2",
       "sm": 6,
-      "help": "Comma-separated EEBUS category numbers. 2 = Energy Management System."
+      "help": "Fixed EEBUS installation category 2 = Energy Management System (EMS).",
+      "readOnly": true
     },
     "ianaPen": {
       "type": "text",
-      "label": "IANA PEN",
+      "label": "IANA PEN for NexoWatt",
       "default": "999999",
       "sm": 6,
-      "help": "Used for generated SHIP IDs. Replace the placeholder with the real NexoWatt PEN when available."
+      "help": "The value 999999 is only a field-test placeholder. Enter the officially assigned NexoWatt IANA PEN before a new production SHIP identity is generated. Changing this field does not replace an already generated SHIP ID."
     },
     "shipId": {
       "type": "text",
       "label": "Generated SHIP ID",
       "readOnly": true,
-      "sm": 12
+      "sm": 12,
+      "help": "Stable identifier of this EOS SHIP node. Do not delete or replace it after pairing devices."
     },
     "localSki": {
       "type": "text",
       "label": "Generated local SKI",
       "readOnly": true,
-      "sm": 12
+      "sm": 12,
+      "help": "Stable Subject Key Identifier derived from the local TLS certificate. This is the key shown or entered during EEBUS pairing."
     },
     "certificateFingerprint": {
       "type": "text",
       "label": "Certificate fingerprint SHA-256",
       "readOnly": true,
-      "sm": 12
+      "sm": 12,
+      "help": "SHA-256 fingerprint of the local TLS certificate for diagnostics and verification."
     },
     "secretsHeader": {
       "type": "header",
@@ -173,6 +182,100 @@
       "label": "Auto accept new devices for field testing",
       "default": false,
       "help": "Only for controlled lab tests. New SHIP peers are trusted automatically and Hello continues immediately."
+    },
+    "directApiHeader": {
+      "type": "header",
+      "text": "Direct NexoWatt EOS §14a connection"
+    },
+    "nexowattBridgeEnabled": {
+      "type": "checkbox",
+      "label": "Enable direct §14a API to NexoWatt EOS",
+      "default": true,
+      "help": "Forwards EEBUS LPC commands directly to the EOS controller without manual data-point mapping."
+    },
+    "nexowattUiInstance": {
+      "type": "text",
+      "label": "NexoWatt UI instance",
+      "default": "auto",
+      "sm": 6,
+      "help": "Use auto for automatic instance detection. A fixed value such as nexowatt-ui.0 is only needed for multiple EOS instances."
+    },
+    "autoApplyClsLimits": {
+      "type": "checkbox",
+      "label": "Apply CLS power limits automatically",
+      "default": true,
+      "help": "When enabled, accepted LPC limits immediately trigger a full EOS control cycle."
+    },
+    "sendImplementationResultToCls": {
+      "type": "checkbox",
+      "label": "Send effective EOS controller readback to the CLS box",
+      "default": true,
+      "help": "The final correlated write result is always sent after the full EOS control cycle. This option additionally sends the effective LoadControl readback when the cycle succeeds."
+    },
+    "nexowattBridgeHeartbeatSec": {
+      "type": "number",
+      "label": "Direct API health-check interval",
+      "min": 5,
+      "max": 300,
+      "default": 5,
+      "unit": "s",
+      "sm": 6
+    },
+    "nexowattBridgeRequestTimeoutMs": {
+      "type": "number",
+      "label": "Maximum API acceptance wait",
+      "min": 100,
+      "max": 5000,
+      "default": 2000,
+      "unit": "ms",
+      "sm": 6,
+      "help": "The regulation command is rejected when EOS does not accept it within this interval."
+    },
+    "nexowattAcceptanceTargetMs": {
+      "type": "number",
+      "label": "Acceptance timing target",
+      "min": 50,
+      "max": 5000,
+      "default": 250,
+      "unit": "ms",
+      "sm": 4
+    },
+    "nexowattControlTargetMs": {
+      "type": "number",
+      "label": "Controller timing target",
+      "min": 100,
+      "max": 10000,
+      "default": 1000,
+      "unit": "ms",
+      "sm": 4
+    },
+    "nexowattFeedbackTargetMs": {
+      "type": "number",
+      "label": "Feedback timing target",
+      "min": 200,
+      "max": 15000,
+      "default": 1500,
+      "unit": "ms",
+      "sm": 4
+    },
+    "nexowattImplementationTimeoutMs": {
+      "type": "number",
+      "label": "Maximum implementation feedback wait",
+      "min": 1000,
+      "max": 30000,
+      "default": 5000,
+      "unit": "ms",
+      "sm": 6
+    },
+    "clsHeartbeatTimeoutSec": {
+      "type": "number",
+      "label": "Fallback CLS heartbeat timeout",
+      "min": 5,
+      "max": 3600,
+      "default": 120,
+      "unit": "s",
+      "sm": 6,
+      "help": "Used only when the CLS peer does not provide a heartbeat timeout. LPC heartbeats are supervised independently of diagnostic polling."
     },
     "commandsHeader": {
       "type": "header",

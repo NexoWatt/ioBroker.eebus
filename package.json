@@ -1,7 +1,7 @@
 {
   "name": "iobroker.eebus",
-  "version": "0.2.1",
-  "description": "NexoWatt EEBUS HEMS adapter with SHIP pairing and SPINE field-test core",
+  "version": "0.3.0",
+  "description": "NexoWatt EOS EEBUS HEMS adapter with SHIP pairing and SPINE field-test core",
   "author": "NexoWatt <info@nexowatt.de>",
   "homepage": "https://github.com/NexoWatt/ioBroker.eebus#readme",
   "repository": {
@@ -52,10 +52,15 @@
     "watch": "tsc -p tsconfig.json --watch",
     "lint": "eslint .",
     "check": "npm run build && npm run lint",
-    "test": "npm run build && npm run test:package",
+    "test": "npm run build && npm run test:config && npm run test:cls-control && npm run test:nexowatt-bridge && npm run test:implementation-result-order && npm run test:package",
     "test:package": "node test/package.js",
     "test:integration": "mocha --exit test/integration/**/*.test.js",
-    "release": "release-script"
+    "release": "release-script",
+    "test:config": "node test/config.js",
+    "test:cls-control-parser": "node test/cls-control-parser.js",
+    "test:nexowatt-bridge": "node test/nexowatt-bridge.js",
+    "test:cls-control": "node test/cls-control-parser.js",
+    "test:implementation-result-order": "node test/implementation-result-order.js"
   },
   "dependencies": {
     "@iobroker/adapter-core": "^3.3.2",

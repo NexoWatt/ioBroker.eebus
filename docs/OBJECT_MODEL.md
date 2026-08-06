@@ -1,6 +1,6 @@
 # Object model
 
-Version `0.2.0` uses a device → channel → state structure.
+Version `0.2.2` uses a device → channel → state structure.
 
 ## Base channels
 
@@ -8,6 +8,22 @@ Version `0.2.0` uses a device → channel → state structure.
 identity.*
 discovery.*
 pairing.*
+```
+
+## Local identity states
+
+```text
+identity.serviceName
+identity.brand
+identity.model
+identity.deviceType
+identity.deviceCategories
+identity.ianaPen
+identity.ianaPenPlaceholder
+identity.announcementActive
+identity.localSki
+identity.shipId
+identity.certificateFingerprint
 ```
 
 ## Device channels

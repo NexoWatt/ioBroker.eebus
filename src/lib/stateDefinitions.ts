@@ -1,4 +1,4 @@
-export type DeviceChannel = 'info' | 'connection' | 'measurements' | 'control' | 'limits' | 'raw' | 'pairing' | 'useCases';
+export type DeviceChannel = 'info' | 'connection' | 'measurements' | 'control' | 'limits' | 'cls' | 'raw' | 'pairing' | 'useCases';
 
 export interface StateDefinition {
     id: string;
@@ -15,7 +15,12 @@ export interface StateDefinition {
 
 export const identityStates: StateDefinition[] = [
     { id: 'serviceName', name: 'Local SHIP service name', type: 'string', role: 'info.name', read: true, write: false },
+    { id: 'brand', name: 'Local EEBUS brand', type: 'string', role: 'info', read: true, write: false },
+    { id: 'model', name: 'Local EEBUS model', type: 'string', role: 'info', read: true, write: false },
     { id: 'deviceType', name: 'Local EEBUS device type', type: 'string', role: 'info', read: true, write: false },
+    { id: 'deviceCategories', name: 'Local EEBUS device categories', type: 'string', role: 'info', read: true, write: false },
+    { id: 'ianaPen', name: 'IANA Private Enterprise Number', type: 'string', role: 'info', read: true, write: false },
+    { id: 'ianaPenPlaceholder', name: 'IANA PEN is a field-test placeholder', type: 'boolean', role: 'indicator', read: true, write: false, def: true },
     { id: 'announcementActive', name: 'Local HEMS announcement active', type: 'boolean', role: 'indicator', read: true, write: false, def: false },
     { id: 'localSki', name: 'Local SKI', type: 'string', role: 'info', read: true, write: false },
     { id: 'shipId', name: 'Local SHIP ID', type: 'string', role: 'info', read: true, write: false },
@@ -49,6 +54,59 @@ export const globalPairingStates: StateDefinition[] = [
     { id: 'pendingCount', name: 'Pending pairing count', type: 'number', role: 'value', read: true, write: false, def: 0 },
     { id: 'trustedCount', name: 'Trusted devices count', type: 'number', role: 'value', read: true, write: false, def: 0 },
     { id: 'lastPairingRequest', name: 'Last pairing request', type: 'string', role: 'json', read: true, write: false },
+];
+
+export const bridgeStates: StateDefinition[] = [
+    { id: 'enabled', name: 'Direct NexoWatt EOS bridge enabled', type: 'boolean', role: 'indicator', read: true, write: false, def: true },
+    { id: 'connected', name: 'NexoWatt EOS direct API connected', type: 'boolean', role: 'indicator.connected', read: true, write: false, def: false },
+    { id: 'readyForControl', name: 'NexoWatt EOS ready for direct §14a control', type: 'boolean', role: 'indicator', read: true, write: false, def: false },
+    { id: 'targetInstance', name: 'NexoWatt UI target instance', type: 'string', role: 'info', read: true, write: false },
+    { id: 'apiVersion', name: 'Direct API version', type: 'number', role: 'value', read: true, write: false, def: 1 },
+    { id: 'manualDatapointMappingRequired', name: 'Manual CLS datapoint mapping required', type: 'boolean', role: 'indicator', read: true, write: false, def: false },
+    { id: 'status', name: 'Direct API status', type: 'string', role: 'state', read: true, write: false },
+    { id: 'lastError', name: 'Last direct API error', type: 'string', role: 'text', read: true, write: false },
+    { id: 'lastHandshakeAt', name: 'Last direct API handshake', type: 'number', role: 'value.time', read: true, write: false, unit: 'ms' },
+    { id: 'lastRoundTripMs', name: 'Last handshake round trip', type: 'number', role: 'value.interval', read: true, write: false, unit: 'ms' },
+    { id: 'remoteVersion', name: 'NexoWatt UI adapter version', type: 'string', role: 'info.version', read: true, write: false },
+    { id: 'acceptanceTargetMs', name: 'Engineering target for command acceptance', type: 'number', role: 'value.interval', read: true, write: false, unit: 'ms' },
+    { id: 'controlTargetMs', name: 'Engineering target for controller application', type: 'number', role: 'value.interval', read: true, write: false, unit: 'ms' },
+    { id: 'feedbackTargetMs', name: 'Engineering target for implementation feedback', type: 'number', role: 'value.interval', read: true, write: false, unit: 'ms' },
+    { id: 'implementationTimeoutMs', name: 'Maximum wait for EOS implementation feedback', type: 'number', role: 'value.interval', read: true, write: false, unit: 'ms' },
+    { id: 'clsHeartbeatTimeoutMs', name: 'CLS heartbeat timeout', type: 'number', role: 'value.interval', read: true, write: false, unit: 'ms' },
+    { id: 'lastCommandId', name: 'Last CLS command ID', type: 'string', role: 'info', read: true, write: false },
+    { id: 'lastCommandJson', name: 'Last direct API command', type: 'string', role: 'json', read: true, write: false },
+    { id: 'pendingCount', name: 'Commands awaiting implementation feedback', type: 'number', role: 'value', read: true, write: false, def: 0 },
+    { id: 'commandCount', name: 'Forwarded CLS commands', type: 'number', role: 'value', read: true, write: false, def: 0 },
+    { id: 'rejectedCount', name: 'Rejected or failed CLS commands', type: 'number', role: 'value', read: true, write: false, def: 0 },
+    { id: 'implementedCount', name: 'Successfully implemented CLS commands', type: 'number', role: 'value', read: true, write: false, def: 0 },
+    { id: 'timeoutCount', name: 'CLS commands with missing EOS feedback', type: 'number', role: 'value', read: true, write: false, def: 0 },
+    { id: 'lastAcceptanceLatencyMs', name: 'CLS receive to EOS acceptance latency', type: 'number', role: 'value.interval', read: true, write: false, unit: 'ms' },
+    { id: 'lastAccepted', name: 'Last command accepted by EOS', type: 'boolean', role: 'indicator', read: true, write: false, def: false },
+    { id: 'lastResult', name: 'Last bridge result', type: 'string', role: 'state', read: true, write: false },
+    { id: 'timingAcceptanceOk', name: 'Acceptance timing target met', type: 'boolean', role: 'indicator', read: true, write: false, def: false },
+    { id: 'lastControlLatencyMs', name: 'CLS receive to controller application latency', type: 'number', role: 'value.interval', read: true, write: false, unit: 'ms' },
+    { id: 'lastFeedbackLatencyMs', name: 'CLS receive to implementation feedback latency', type: 'number', role: 'value.interval', read: true, write: false, unit: 'ms' },
+    { id: 'timingControlOk', name: 'Controller timing target met', type: 'boolean', role: 'indicator', read: true, write: false, def: false },
+    { id: 'timingFeedbackOk', name: 'Feedback timing target met', type: 'boolean', role: 'indicator', read: true, write: false, def: false },
+    { id: 'lastImplementationJson', name: 'Last EOS implementation feedback', type: 'string', role: 'json', read: true, write: false },
+];
+
+export const clsStates: StateDefinition[] = [
+    { id: 'active', name: 'CLS consumption limitation active', type: 'boolean', role: 'indicator', read: true, write: false, def: false },
+    { id: 'limitW', name: 'Requested CLS consumption limit', type: 'number', role: 'level.power.consumption', read: true, write: false, unit: 'W' },
+    { id: 'commandId', name: 'Current CLS command ID', type: 'string', role: 'info', read: true, write: false },
+    { id: 'sourceDeviceId', name: 'CLS source device ID', type: 'string', role: 'info', read: true, write: false },
+    { id: 'receivedAt', name: 'CLS command received', type: 'number', role: 'value.time', read: true, write: false, unit: 'ms' },
+    { id: 'validUntil', name: 'CLS command validity end', type: 'number', role: 'value.time', read: true, write: false, unit: 'ms' },
+    { id: 'failsafeLimitW', name: 'CLS failsafe consumption limit', type: 'number', role: 'value.power.consumption', read: true, write: false, unit: 'W' },
+    { id: 'failsafeDurationMs', name: 'CLS failsafe minimum duration', type: 'number', role: 'value.interval', read: true, write: false, unit: 'ms' },
+    { id: 'failsafeActive', name: 'CLS failsafe active', type: 'boolean', role: 'indicator', read: true, write: false, def: false },
+    { id: 'heartbeatLastAt', name: 'Last CLS heartbeat', type: 'number', role: 'value.time', read: true, write: false, unit: 'ms' },
+    { id: 'heartbeatAgeMs', name: 'CLS heartbeat age', type: 'number', role: 'value.interval', read: true, write: false, unit: 'ms' },
+    { id: 'heartbeatHealthy', name: 'CLS heartbeat healthy', type: 'boolean', role: 'indicator', read: true, write: false, def: false },
+    { id: 'status', name: 'CLS control status', type: 'string', role: 'state', read: true, write: false },
+    { id: 'lastSpineAcceptance', name: 'Last correlated SPINE implementation result', type: 'string', role: 'json', read: true, write: false },
+    { id: 'lastSpineReadback', name: 'Last SPINE controller readback', type: 'string', role: 'json', read: true, write: false },
 ];
 
 export const deviceStates: StateDefinition[] = [
@@ -106,6 +164,28 @@ export const deviceStates: StateDefinition[] = [
     { id: 'gridExportLimit', name: 'Grid export limit', channel: 'limits', type: 'number', role: 'level.power.production', read: true, write: true, unit: 'W' },
     { id: 'heatPumpPowerLimit', name: 'Heat pump power limit', channel: 'limits', type: 'number', role: 'level.power.consumption', read: true, write: true, unit: 'W' },
 
+    { id: 'active', name: 'CLS limitation active', channel: 'cls', type: 'boolean', role: 'indicator', read: true, write: false, def: false },
+    { id: 'limitW', name: 'Requested CLS consumption limit', channel: 'cls', type: 'number', role: 'level.power.consumption', read: true, write: false, unit: 'W' },
+    { id: 'effectiveLimitW', name: 'EOS effective CLS limit', channel: 'cls', type: 'number', role: 'value.power.consumption', read: true, write: false, unit: 'W' },
+    { id: 'validUntil', name: 'CLS limit validity end', channel: 'cls', type: 'number', role: 'value.time', read: true, write: false, unit: 'ms' },
+    { id: 'commandId', name: 'CLS command ID', channel: 'cls', type: 'string', role: 'info', read: true, write: false },
+    { id: 'operation', name: 'CLS control operation', channel: 'cls', type: 'string', role: 'state', read: true, write: false },
+    { id: 'limitId', name: 'EEBUS limit IDs', channel: 'cls', type: 'string', role: 'json', read: true, write: false },
+    { id: 'receivedAt', name: 'CLS command received', channel: 'cls', type: 'number', role: 'value.time', read: true, write: false, unit: 'ms' },
+    { id: 'acceptedAt', name: 'CLS command accepted by EOS', channel: 'cls', type: 'number', role: 'value.time', read: true, write: false, unit: 'ms' },
+    { id: 'reactionMs', name: 'CLS command acceptance latency', channel: 'cls', type: 'number', role: 'value.interval', read: true, write: false, unit: 'ms' },
+    { id: 'status', name: 'CLS bridge status', channel: 'cls', type: 'string', role: 'state', read: true, write: false },
+    { id: 'failsafeActive', name: 'CLS failsafe active', channel: 'cls', type: 'boolean', role: 'indicator', read: true, write: false, def: false },
+    { id: 'failsafeLimitW', name: 'CLS failsafe consumption limit', channel: 'cls', type: 'number', role: 'value.power.consumption', read: true, write: false, unit: 'W' },
+    { id: 'failsafeDurationMs', name: 'CLS failsafe duration', channel: 'cls', type: 'number', role: 'value.interval', read: true, write: false, unit: 'ms' },
+    { id: 'heartbeatLastSeen', name: 'Last CLS heartbeat', channel: 'cls', type: 'number', role: 'value.time', read: true, write: false, unit: 'ms' },
+    { id: 'heartbeatTimeoutMs', name: 'CLS heartbeat timeout', channel: 'cls', type: 'number', role: 'value.interval', read: true, write: false, unit: 'ms' },
+    { id: 'heartbeatAgeMs', name: 'CLS heartbeat age', channel: 'cls', type: 'number', role: 'value.interval', read: true, write: false, unit: 'ms' },
+    { id: 'lastFeedback', name: 'Last EOS CLS feedback', channel: 'cls', type: 'string', role: 'json', read: true, write: false },
+    { id: 'lastSpineAcceptance', name: 'Last correlated SPINE implementation result', channel: 'cls', type: 'string', role: 'json', read: true, write: false },
+    { id: 'lastSpineReadback', name: 'Last SPINE controller readback', channel: 'cls', type: 'string', role: 'json', read: true, write: false },
+    { id: 'lastError', name: 'Last CLS processing error', channel: 'cls', type: 'string', role: 'text', read: true, write: false },
+
     { id: 'trusted', name: 'Trusted', channel: 'pairing', type: 'boolean', role: 'switch.enable', read: true, write: true, def: false },
     { id: 'approve', name: 'Approve pairing', channel: 'pairing', type: 'boolean', role: 'button', read: true, write: true, def: false },
     { id: 'reject', name: 'Reject pairing', channel: 'pairing', type: 'boolean', role: 'button', read: true, write: true, def: false },
@@ -139,6 +219,7 @@ export const channelNames: Record<DeviceChannel, string> = {
     measurements: 'Measurements',
     control: 'Control',
     limits: 'Limits',
+    cls: 'CLS / §14a direct bridge',
     raw: 'Raw diagnostics',
     pairing: 'Pairing',
     useCases: 'Use cases',

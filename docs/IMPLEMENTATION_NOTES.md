@@ -2,7 +2,7 @@
 
 ## Status
 
-Version `0.2.0` is a field-test core. It is intended to be installed on NexoWatt EOS and tested with real EEBUS devices.
+Version `0.2.2` is a field-test core. It is intended to be installed on NexoWatt EOS and tested with real EEBUS devices.
 
 Implemented:
 
@@ -40,3 +40,8 @@ commandDryRun = true
 ```
 
 Read-only NodeManagement discovery is allowed after SHIP data exchange because the adapter needs it for automatic device classification.
+
+
+## Legacy identity migration
+
+Version `0.2.2` migrates known old instance values such as `model=EEBUS Adapter` and `deviceType=EnergyOperationSystem` to the fixed EOS HEMS identity (`NexoWatt`, `EOS`, `EnergyManagementSystem`, category `2`). Only the changed identity keys are persisted so protected/encrypted certificate and private-key fields are not rewritten by the migration.

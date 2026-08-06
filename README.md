@@ -1,10 +1,14 @@
 # ioBroker.eebus
 
-NexoWatt EEBUS Adapter for ioBroker.
+NexoWatt EOS EEBUS Adapter for ioBroker.
 
 This adapter exposes **NexoWatt EOS** as a local EEBUS **Energy Management System / HEMS** and prepares SHIP/SPINE communication with energy devices such as wallboxes, CLS/control boxes, smart meters, grid connection points, PV inverters, batteries, heat pumps and HVAC/climate devices.
 
-> Status: field-test core. Version `0.2.1` enables JSONConfig i18n so the adapter settings follow the ioBroker Admin/system language. It keeps the `0.2.0` SHIP/SPINE field-test core with SHIP session handling, pairing/trust states, SPINE NodeManagement discovery, use-case detection and field-test command mappings. It still needs validation with real EEBUS devices before production or certification-level use.
+> Status: field-test core. Version `0.3.0` adds the direct IF_CLS_CTRL/LPC bridge to NexoWatt EOS without manual CLS datapoint mapping. LPC commands are forwarded through a versioned in-memory adapter API, trigger an immediate full EOS control cycle and receive a positive correlated SPINE result only after that cycle succeeds, followed by the effective controller readback. SHIP/SPINE interoperability still requires validation with real CLS/control boxes before production or certification-level use.
+
+## German operator guide
+
+A German step-by-step setup, pairing, read/write and troubleshooting guide is available in [docs/ANWENDUNG_DE.md](docs/ANWENDUNG_DE.md).
 
 ## Documentation basis
 
@@ -18,7 +22,55 @@ The implementation was prepared from the EEBUS documentation package supplied to
 
 Public project information is available from the EEBUS Initiative: <https://www.eebus.org/>
 
-## What is implemented in 0.2.1
+## What is implemented in 0.3.0
+
+
+### Direct §14a / CLS connection to NexoWatt EOS
+
+When `nexowattBridgeEnabled` is active, the adapter connects automatically to an enabled `nexowatt-ui` instance and forwards accepted EEBUS LPC consumption limits directly to the central EOS §14a controller. No CLS-box datapoints have to be selected manually.
+
+The time-critical path is deliberately event-driven and de-duplicates both completed and still in-flight retransmissions by the stable SPINE-derived command ID:
+
+```text
+CLS box -> SHIP/SPINE LPC -> ioBroker.eebus memory bridge
+        -> nexowatt-ui direct API -> immediate full EMS control/write cycle
+        -> final correlated SPINE ResultData -> effective LoadControl readback
+```
+
+The response path is deliberately fail-closed:
+
+1. The EEBUS adapter receives an internal in-memory acceptance only after EOS has stored the trusted command and queued the immediate central control cycle. This internal acceptance is not presented to the CLS box as successful implementation.
+2. The correlated SPINE ResultData is sent after the complete EOS controller/write cycle. A positive result and the optional effective LoadControl readback are emitted only when the relevant central and downstream paths succeeded; failed or degraded cycles return a negative correlated result.
+
+Default field-test engineering targets are:
+
+```text
+CLS receive -> EOS acceptance:              250 ms
+CLS receive -> completed central EOS cycle: 1,000 ms
+CLS receive -> implementation feedback:     1,500 ms
+```
+
+These are configurable NexoWatt engineering targets for diagnostics, not blanket statutory deadlines. The adapter records acceptance, control and feedback latency under `bridge.*`.
+
+Heartbeat, command validity and LPC failsafe are supervised in the EEBUS gateway. A communication fault never increases the allowed power. A configured failsafe remains active for the duration transmitted by the CLS peer and is then released through the same direct EOS control path. Heartbeat recovery alone does not release it immediately; a fresh explicit LPC write or release may transition earlier. If the peer supplies no valid failsafe duration, the field-test fallback keeps the last restrictive allowance until a fresh explicit LPC write or release is accepted.
+
+Important bridge states include:
+
+```text
+bridge.connected
+bridge.readyForControl
+bridge.status
+bridge.lastAcceptanceLatencyMs
+bridge.lastControlLatencyMs
+bridge.lastFeedbackLatencyMs
+bridge.timingAcceptanceOk
+bridge.timingControlOk
+bridge.timingFeedbackOk
+cls.active
+cls.limitW
+cls.failsafeActive
+cls.heartbeatHealthy
+```
 
 ### NexoWatt EOS as HEMS
 
@@ -33,6 +85,8 @@ TXT register=true
 ```
 
 This is required so EEBUS wallboxes can show NexoWatt EOS in their HEMS pairing list.
+
+The adapter automatically migrates known legacy instance values such as `model=EEBUS Adapter` and `deviceType=EnergyOperationSystem` to `model=EOS` and `deviceType=EnergyManagementSystem`. Brand, model, device type and local category are shown as fixed identity fields in the admin page.
 
 ### Local EEBUS identity
 

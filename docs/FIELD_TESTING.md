@@ -1,6 +1,6 @@
 # NexoWatt EEBUS field testing
 
-This document describes the first real-device test flow for `iobroker.eebus` version `0.2.0`.
+This document describes the first real-device test flow for `iobroker.eebus` version `0.2.2`.
 
 ## 1. Preconditions
 
@@ -11,6 +11,7 @@ This document describes the first real-device test flow for `iobroker.eebus` ver
 - The adapter instance is running.
 - `serviceName` is `NexoWatt EOS`.
 - `deviceType` is `EnergyManagementSystem`.
+- `model` is `EOS` and device category is `2`.
 
 ## 2. Discovery check
 

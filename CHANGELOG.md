@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.3.0 (2026-08-05)
+
+- Added versioned direct `ioBroker.eebus` -> `nexowatt-ui` §14a API; no manual CLS datapoint mapping is required in direct mode.
+- Added IF_CLS_CTRL/LPC parsing for consumption limits, release, partial writes, heartbeat and failsafe configuration, including strictest-limit aggregation and production-limit rejection.
+- Added an in-memory, event-driven command path that sends each time-critical control command exactly once and queues a 0 ms full EOS control cycle before diagnostic state writes. Genuine SPINE retransmissions remain idempotent through the stable command ID, including retransmissions arriving while the first ioBroker acceptance callback is still pending.
+- Added direct in-memory EOS acceptance plus final protocol feedback: negative rejections are returned immediately, while a positive correlated SPINE ResultData is sent only after the complete EOS controller/write cycle; the effective LoadControl readback follows only on success.
+- Added configurable end-to-end engineering targets of 250 ms for API acceptance, 1,000 ms from CLS receipt to the completed central control cycle, and 1,500 ms from CLS receipt to implementation feedback.
+- Added heartbeat/validity supervision with fail-restrictive behavior: a configured failsafe never widens the last active limit, remains active for the transmitted duration and is then released locally without reusing the old SPINE acknowledgement correlation. Heartbeat recovery alone does not immediately release it; without a valid duration the restrictive field-test fallback remains active until a fresh explicit LPC write or release.
+- Added bridge, CLS and per-device diagnostics plus automatic same-host `nexowatt-ui` instance discovery.
+- Added parser, bridge, timing, duplicate-command and configuration regression tests.
+- Kept field-test defaults conservative: trusted pairing is required, unknown peers are rejected and real CLS/SHIP/SPINE interoperability must still be validated on hardware.
+
+## 0.2.2 (2026-07-31)
+
+- Renamed the adapter display title to NexoWatt EOS EEBUS Adapter.
+- Added automatic migration of legacy instance values: `model=EEBUS Adapter` becomes `EOS` and `deviceType=EnergyOperationSystem` becomes `EnergyManagementSystem`.
+- Persisted corrected service identity values so existing installations display NexoWatt EOS consistently after restart.
+- Fixed the local HEMS identity to brand `NexoWatt`, model `EOS`, device type `EnergyManagementSystem` and EEBUS category `2` in the admin page.
+- Added a clear warning for the field-test IANA PEN placeholder `999999`.
+- Added identity states for brand, model, category, IANA PEN and placeholder status.
+- Added the German operating, pairing, read/write and troubleshooting guide `docs/ANWENDUNG_DE.md`.
+
 ## 0.2.1 (2026-07-31)
 
 - Enabled JSONConfig internationalization with top-level `i18n: true` so the adapter admin settings follow the ioBroker admin/system language.

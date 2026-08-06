@@ -1,6 +1,6 @@
-import { EebusConfig } from './config';
+import { EebusConfig, isPlaceholderIanaPen } from './config';
 import { DeviceClass, DiscoveredShipNode, EebusFeatureSummary, EebusIdentity, ShipConnectionState } from './eebusTypes';
-import { channelNames, deviceStates, discoveryStates, globalPairingStates, identityStates, StateDefinition } from './stateDefinitions';
+import { bridgeStates, channelNames, clsStates, deviceStates, discoveryStates, globalPairingStates, identityStates, StateDefinition } from './stateDefinitions';
 import { jsonStringifySafe } from './sanitizer';
 
 export class ObjectFactory {
@@ -15,11 +15,23 @@ export class ObjectFactory {
 
         await this.ensureChannel('pairing', 'Global EEBUS pairing');
         for (const state of globalPairingStates) await this.ensureState(`pairing.${state.id}`, state);
+
+        await this.ensureChannel('bridge', 'NexoWatt EOS direct §14a API');
+        for (const state of bridgeStates) await this.ensureState(`bridge.${state.id}`, state);
+
+        await this.ensureChannel('cls', 'CLS / §14a control');
+        for (const state of clsStates) await this.ensureState(`cls.${state.id}`, state);
+
     }
 
     public async publishIdentity(identity: EebusIdentity, config: EebusConfig): Promise<void> {
         await this.adapter.setStateAsync('identity.serviceName', { val: config.serviceName, ack: true });
+        await this.adapter.setStateAsync('identity.brand', { val: config.brand, ack: true });
+        await this.adapter.setStateAsync('identity.model', { val: config.model, ack: true });
         await this.adapter.setStateAsync('identity.deviceType', { val: config.deviceType, ack: true });
+        await this.adapter.setStateAsync('identity.deviceCategories', { val: config.deviceCategories.join(','), ack: true });
+        await this.adapter.setStateAsync('identity.ianaPen', { val: config.ianaPen, ack: true });
+        await this.adapter.setStateAsync('identity.ianaPenPlaceholder', { val: isPlaceholderIanaPen(config.ianaPen), ack: true });
         await this.adapter.setStateAsync('identity.announcementActive', { val: config.shipServerEnabled && config.announceShipService, ack: true });
         await this.adapter.setStateAsync('identity.localSki', { val: identity.localSki, ack: true });
         await this.adapter.setStateAsync('identity.shipId', { val: identity.shipId, ack: true });
